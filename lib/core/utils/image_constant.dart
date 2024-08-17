@@ -3,6 +3,7 @@
 class ImageConstant {
   // Image folder path
   static String imagePath = 'assets/images';
+static String imgdeshboard = '$imagePath/DeshboardHexagon.png';
 
   // Splash Screen images
   static String imgLogoSvgFile3 = '$imagePath/img_logo_svg_file_3.png';

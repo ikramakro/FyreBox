@@ -1,10 +1,14 @@
+import '../../core/utils/constant.dart';
 import '../apiClient/api_client.dart';
 
+import '../models/alert_model.dart';
 import '../models/base_model.dart';
 import '../models/dashboard_model.dart';
 import '../models/device_model.dart';
 import '../models/loginDeviceAuth/post_login_device_auth_resp.dart';
+import '../models/org_detail.dart';
 import '../models/user_data_model.dart';
+import '../models/vistors_model.dart';
 
 /// Repository class for managing API requests.
 /// This class provides a simplified interface for making the
@@ -38,7 +42,29 @@ class Repository {
     return UserDataModel.fromJson(response.data);
   }
 
+  Future<AlertResponse> alertData({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_data.php', formData: formData);
+    return AlertResponse.fromJson(response.data);
+  }
+
   Future<BaseModel> addUser({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
+  Future<BaseModel> addDevice({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
+  Future<BaseModel> orderDevice({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.post1(
         baseUrl: 'https://fyreboxhub.com/api/set_data.php',
         formdata: formData,
@@ -51,4 +77,18 @@ class Repository {
         baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
     return DeviceResponse.fromJson(response.data);
   }
+  Future<VistorResponse> vistorData({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_data.php', formData: formData);
+    return VistorResponse.fromJson(response.data);
+  }
+  Future<Organization> orgData({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_org_details', formData: formData);
+        evacuationMaps= Organization.fromJson(response.data).dbData?.evacuationMaps??[];
+        helplines= Organization.fromJson(response.data).dbData?.helplines??[];
+        dbData=Organization.fromJson(response.data).dbData;
+    return Organization.fromJson(response.data);
+  }
 }
+// https://fyreboxhub.com/api/get_data.php?operation=get_visitor&org_id=1

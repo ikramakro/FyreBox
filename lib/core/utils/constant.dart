@@ -1,5 +1,6 @@
 import 'package:toastification/toastification.dart';
 
+import '../../data/models/org_detail.dart';
 import '../app_export.dart';
 
 // enum Status { LOADING, EROR, SUCCESS }
@@ -123,7 +124,9 @@ showError(String text) {
     // ),
   );
 }
-
+List<EvacuationMap>? evacuationMaps;
+  List<Helpline>? helplines;
+  DBData?  dbData;
 // String appId = 'f8580b0a2vtst';
 // String jwtToken = '';
 // String oneIDnigol = '';

@@ -1,4 +1,5 @@
 import '../../core/app_export.dart';
+import '../../core/utils/constant.dart';
 import 'provider/deshboard_provider.dart';
 import 'widgets/chipviewone_item_widget.dart';
 
@@ -21,53 +22,51 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => DeshboardProvider(),
-      child: SafeArea(
-        child: Scaffold(
-          extendBody: true,
-          extendBodyBehindAppBar: true,
-          body: Container(
-            width: double.maxFinite,
-            height: double.maxFinite,
-            decoration: BoxDecoration(
-              color: appTheme.whiteA700,
-              image: DecorationImage(
-                image: AssetImage(
-                  ImageConstant.imgLoginScreen,
-                ),
-                fit: BoxFit.cover,
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        body: Container(
+          width: double.maxFinite,
+          height: double.maxFinite,
+          decoration: BoxDecoration(
+            color: appTheme.whiteA700,
+            image: DecorationImage(
+              image: AssetImage(
+                ImageConstant.imgLoginScreen,
               ),
+              fit: BoxFit.cover,
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: double.maxFinite,
-                    child: Column(
-                      children: [
-                        SizedBox(height: 24.h),
-                        Container(
-                          width: double.maxFinite,
-                          margin: EdgeInsets.only(
-                            left: 28.h,
-                            right: 18.h,
-                          ),
-                          child: Column(
-                            children: [
-                              _buildTodaySalesSummary(
-                                context,
-                              ),
-                              SizedBox(height: 24.h),
-                              _buildEvacuationMapSection(context)
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.maxFinite,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 24.h),
+                      Container(
+                        width: double.maxFinite,
+                        margin: EdgeInsets.only(
+                          left: 28.h,
+                          right: 18.h,
+                        ),
+                        child: Column(
+                          children: [
+                            _buildTodaySalesSummary(
+                              context,
+                            ),
+                            SizedBox(height: 24.h),
+                            _buildEvacuationMapSection(context)
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(height: 4.h)
-                ],
-              ),
+                ),
+                SizedBox(height: 4.h)
+              ],
             ),
           ),
         ),
@@ -111,7 +110,7 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
               List name = [
                 'Total Alerts',
                 'Total Devices',
-                'Total Due Invoices',
+                'Due Invoices',
                 'Total Visitors'
               ];
               List icon = [
@@ -138,8 +137,8 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 physics: NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 0.h,
-                  mainAxisSpacing: 0.h,
+                  crossAxisSpacing: 20.h,
+                  mainAxisSpacing: 20.h,
                   childAspectRatio: 1.5,
                 ),
                 itemCount: 4,
@@ -277,6 +276,7 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   // }
 
   Widget _buildEvacuationMapSection(BuildContext context) {
+    print('232323232323232333039458034584059850843098509999999999==============================${dbData?.orgEvacuationMap}');
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(right: 4.h),
@@ -301,11 +301,14 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
             ),
           ),
           SizedBox(height: 6.h),
+            Consumer<DeshboardProvider>(
+            builder: (context, provider, child) {
+              return
           CustomImageView(
-            imagePath: ImageConstant.imgImage65c0ccb01c4a7Diagram,
+            imagePath: 'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap??''}',
             height: 268.h,
             width: double.maxFinite,
-          )
+          );})
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import '../../core/app_export.dart';
@@ -29,6 +30,7 @@ class DeviceScreenState extends State<DeviceScreen> {
     super.initState();
   }
 
+  final _key = GlobalKey<ExpandableFabState>();
   void _showDeleteConfirmationDialog(
       BuildContext context, DBData user, DeviceProvider provider) {
     showDialog(
@@ -137,54 +139,32 @@ class DeviceScreenState extends State<DeviceScreen> {
       create: (context) => DeviceProvider(),
       child: SafeArea(
         child: Scaffold(
-          floatingActionButton: ExpandableFab(
-            type: ExpandableFabType.up,
-            childrenAnimation: ExpandableFabAnimation.none,
-            // distance: 70,
-            overlayStyle: ExpandableFabOverlayStyle(
-              color: Colors.amber.withOpacity(0.9),
-            ),
-            children: const [
-              Row(
-                children: [
-                  Text('Remind'),
-                  SizedBox(width: 20),
-                  FloatingActionButton.small(
-                    heroTag: null,
-                    onPressed: null,
-                    child: Icon(Icons.notifications),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('Email'),
-                  SizedBox(width: 20),
-                  FloatingActionButton.small(
-                    heroTag: null,
-                    onPressed: null,
-                    child: Icon(Icons.email),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('Star'),
-                  SizedBox(width: 20),
-                  FloatingActionButton.small(
-                    heroTag: null,
-                    onPressed: null,
-                    child: Icon(Icons.star),
-                  ),
-                ],
-              ),
-              FloatingActionButton.small(
-                heroTag: null,
-                onPressed: null,
-                child: Icon(Icons.add),
-              ),
-            ],
-          ),
+          floatingActionButton: SpeedDial(
+              spacing: 3,
+              animatedIcon: AnimatedIcons.menu_close,
+              // activeBackgroundColor: Colors.red,
+              // activeForegroundColor: Colors.red,
+              // overlayColor: Colors.red,
+              children: [
+                SpeedDialChild(
+                  child: const Icon(Icons.devices),
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  label: 'Add Device',
+                  onTap: () {
+                    NavigatorService.pushNamed(AppRoutes.addDeviceScreen);
+                  },
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.add),
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  label: 'Order Device',
+                  onTap: () {
+                    NavigatorService.pushNamed(AppRoutes.orderDeviceScreen);
+                  },
+                ),
+              ]),
           // floatingActionButton: FloatingActionButton(
           //   onPressed: () {
           //     NavigatorService.pushNamed(AppRoutes.addDeviceScreen);
@@ -364,8 +344,6 @@ class DeviceDataSource extends DataGridSource {
                         onDelete(device);
                       } else if (value == 'Update') {
                         // Add your update logic here
-                      } else if (value == 'Checklist') {
-                        // Add your checklist logic here
                       }
                     },
                     itemBuilder: (BuildContext context) {

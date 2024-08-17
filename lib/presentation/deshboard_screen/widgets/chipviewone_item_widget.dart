@@ -31,8 +31,8 @@ class ChipviewoneItemWidget extends StatelessWidget {
           ),
         ),
         RawChip(
-          padding:
-              EdgeInsets.only(top: 14.h, right: 30.h, bottom: 14.h, left: 10.h),
+          // padding:
+          //     EdgeInsets.only(top: 14.h, right: 30.h, bottom: 1.h, left: 10.h),
           showCheckmark: false,
           labelPadding: EdgeInsets.zero,
           label: Text(
@@ -45,8 +45,8 @@ class ChipviewoneItemWidget extends StatelessWidget {
             ),
           ),
           avatar: Container(
-            height: 40.h,
-            width: 40.h,
+            // height: 40.h,
+            // width: 40.h,
             margin: EdgeInsets.only(right: 5.h),
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
             child: Center(

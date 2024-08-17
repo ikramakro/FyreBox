@@ -28,6 +28,23 @@ class DeviceModel {
       isSelected: true,
     ),
   ];
+
+  List<SelectionPopupModel> orderdeviceTypeDropdownItemList = [
+    SelectionPopupModel(
+      id: 2,
+      title: "Fyrebox Unit",
+    ),
+    SelectionPopupModel(
+      id: 1,
+      title: "Admin Unit",
+      isSelected: true,
+    ),
+    SelectionPopupModel(
+      id: 1,
+      title: "Intefration Unit",
+      isSelected: true,
+    ),
+  ];
   List<ActionsItemModel> actionsItemList =
       List.generate(2, (index) => ActionsItemModel());
 }

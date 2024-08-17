@@ -14,19 +14,34 @@ class DeshboardProvider extends ChangeNotifier {
   DashboardModel model = DashboardModel();
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
+  PrefUtils prefUtils = PrefUtils();
   DeshboardProvider() {
     // Initialize the model here
     init();
   }
   init() async {
     await loadDashboardData();
+    loadInitialData();
+  }
+Future<void> loadInitialData() async {
+    await orderDevice();
   }
 
+  FutureOr<void> orderDevice() async {
+    USERDATA userdata = prefUtils.getUserData()!;
+    await _repository.orgData(
+      formData: {
+       'org_id': userdata.orgId
+      },
+    );
+    // Notify listeners if there's any data that needs to update UI
+    notifyListeners();
+  }
   FutureOr<void> loadDashboardData({
     Function? onSuccess,
     Function? onError,
   }) async {
-    PrefUtils prefUtils = PrefUtils();
+    
     // sp.saveToDisk('orgid', postLoginDeviceAuthResp.uSERDATA?.orgId ?? '');
     USERDATA userdata = prefUtils.getUserData()!;
 

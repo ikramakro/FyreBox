@@ -1,37 +1,46 @@
-// import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-// import 'models/splash_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import '../../../../core/app_export.dart';
 import 'provider/splash_provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const SplashScreen({Key? key}) : super(key: key);
+
   @override
   SplashScreenState createState() => SplashScreenState();
+
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => SplashProvider(),
-      child: SplashScreen(),
+      child: const SplashScreen(),
     );
   }
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  // Retrieve the boolean value
   PrefUtils prefUtils = PrefUtils();
 
   @override
   void initState() {
     super.initState();
-    bool isDarkMode = prefUtils.getBoolValue('isLogin');
-    print('Is isLogin: $isDarkMode');
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      NavigatorService.popAndPushNamed(
-        isDarkMode ? AppRoutes.rootScreen : AppRoutes.loginScreen,
-      );
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _loadData();
     });
+  }
+
+  void _loadData() async {
+    // Load the data in the provider
+     bool isLogin = prefUtils.getBoolValue('isLogin');
+  //   final splashProvider = Provider.of<SplashProvider>(context, listen: false);
+  //  if(isLogin){
+  //   await splashProvider.loadInitialData();
+  //  } 
+
+    // Navigate after a delay
+    await Future.delayed(const Duration(milliseconds: 3000));
+    NavigatorService.popAndPushNamed(
+      isLogin ? AppRoutes.rootScreen : AppRoutes.loginScreen,
+    );
   }
 
   @override
@@ -58,10 +67,11 @@ class SplashScreenState extends State<SplashScreen> {
       child: Column(
         children: [
           CustomImageView(
-            imagePath: ImageConstant.imgLogoSvgFile3,
+            imagePath: ImageConstant.imgFyreboxLogo,
             height: 212.h,
             width: double.maxFinite,
             margin: EdgeInsets.only(right: 16.h),
+            fit: BoxFit.contain,
           )
         ],
       ),

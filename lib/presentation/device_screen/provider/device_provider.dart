@@ -15,6 +15,9 @@ class DeviceProvider extends ChangeNotifier {
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
+
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController deviceNameController = TextEditingController();
   final TextEditingController siteNameController = TextEditingController();
   final TextEditingController deviceLocationController =
@@ -31,7 +34,7 @@ class DeviceProvider extends ChangeNotifier {
   bool hasInsertAccess = false;
   bool hasUpdateAccess = false;
   bool hasDeleteAccess = false;
-
+  String? selectedDeviceType;
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -51,6 +54,55 @@ class DeviceProvider extends ChangeNotifier {
   void setMfrDate(String date) {
     mfrDateController.text = date;
     notifyListeners();
+  }
+
+  FutureOr<void> orderDevice() async {
+    USERDATA userdata = prefUtils.getUserData()!;
+    await _repository.orderDevice(
+      formData: {
+        'device_type': '1',
+        'device_quantity': quantityController.text,
+        'device_description': descriptionController.text,
+        'operation': 'order_device',
+        'access_token': 'developer_bypass',
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 1);
+        notifyListeners();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? '');
+      }
+    });
+  }
+
+  FutureOr<void> addDevice() async {
+    USERDATA userdata = prefUtils.getUserData()!;
+    await _repository.addDevice(
+      formData: {
+        'org_id': userdata.orgId,
+        'device_name': deviceNameController.text,
+        'device_type': deviceModelObj.deviceTypeDropdownItemList,
+        'device_cite_name': siteNameController.text,
+        'device_location': deviceLocationController.text,
+        'manufacturer_name': mfrNameController.text,
+        'manufacturer_contact': mfrContactController.text,
+        'manufacturer_email': mfrEmailController.text,
+        'manufacturer_date': mfrDateController.text,
+        'serial_number': serialNumberController.text,
+        'operation': 'add_device',
+        'access_token': 'developer_bypass',
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 1);
+        notifyListeners();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? '');
+      }
+    });
   }
 
   FutureOr<void> addUser({
@@ -119,6 +171,11 @@ class DeviceProvider extends ChangeNotifier {
 
   void setOrganizationOwner(bool value) {
     isOrganizationOwner = value;
+    notifyListeners();
+  }
+
+  void setOrderDeviceType(String? type) {
+    selectedDeviceType = type;
     notifyListeners();
   }
 

@@ -4,6 +4,8 @@ import 'package:toastification/toastification.dart';
 import 'core/app_export.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Future.wait([
@@ -27,6 +29,7 @@ class MyApp extends StatelessWidget {
             builder: (context, provider, child) {
               return ToastificationWrapper(
                 child: MaterialApp(
+                  scaffoldMessengerKey: scaffoldKey,
                   title: 'FyreBox',
                   debugShowCheckedModeBanner: false,
                   theme: theme,
@@ -37,7 +40,7 @@ class MyApp extends StatelessWidget {
                     GlobalWidgetsLocalizations.delegate,
                     GlobalCupertinoLocalizations.delegate
                   ],
-                  supportedLocales: [Locale('en', '')],
+                  supportedLocales: const [Locale('en', '')],
                   initialRoute: AppRoutes.initialRoute,
                   routes: AppRoutes.routes,
                 ),

@@ -108,7 +108,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                       backgroundColor:
                           WidgetStateProperty.all(appTheme.deepOrangeA100)),
                   onPressed: () {
-                    // provider.addDevice();
+                    provider.addDevice();
                   },
                   text: 'Add Device',
                   height: 50,

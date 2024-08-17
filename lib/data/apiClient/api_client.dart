@@ -73,13 +73,18 @@ class ApiClient {
     }
   }
 
-  post({required String baseUrl, required formdata}) async {
+  post({required String baseUrl, required formdata,String? contantType}) async {
     var connected = await NetworkInfo().isConnected();
 
     if (connected) {
       Dio dio = await launchDio();
       // print(' == $baseUrl $formdata');
-      final response = await dio.post(baseUrl, queryParameters: formdata);
+      final response = await dio.post(baseUrl, queryParameters: formdata, options: Options(
+              contentType: contantType ?? 'application/json',
+              followRedirects: false,
+              validateStatus: (status) {
+                return status! < 500;
+              }),);
 
       if (response.statusCode == 200) {
         return response;
