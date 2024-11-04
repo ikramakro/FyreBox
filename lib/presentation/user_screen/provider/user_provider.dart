@@ -65,6 +65,27 @@ class UserProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> deleteUser(String userId) async {
+    await _repository.addUser(
+      formData: {
+        'operation': 'delete_user_account',
+        'user_id': userId,
+        'access_token': 'developer_bypass',
+      },
+    ).then((value) {
+      if (value.sTATUS != "ERROR") {
+        // Remove the user from the list
+        model.dBDATA?.removeWhere((user) => user.id.toString() == userId);
+        notifyListeners();
+        showSuccess('User deleted successfully');
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Failed to delete user');
+      }
+    }).catchError((error) {
+      showError('An error occurred while deleting the user');
+    });
+  }
+
   FutureOr<void> loadDashboardData({
     Function? onSuccess,
     Function? onError,
@@ -129,7 +150,7 @@ class UserProvider extends ChangeNotifier {
 
   void onChanged(String value) async {
     // For filtered data
-    String org = await prefUtils.getOrgValue('orgid');
+    String org = prefUtils.getOrgValue('orgid');
 
     if (value == 'Active') {
       await _repository.userData(
@@ -183,9 +204,9 @@ class UserProvider extends ChangeNotifier {
   }
 
   void onSelectedChipView(int index, bool value) {
-    userModelObj.actionsItemList.forEach((element) {
+    for (var element in userModelObj.actionsItemList) {
       element.isSelected = false;
-    });
+    }
     userModelObj.actionsItemList[index].isSelected = value;
     notifyListeners();
   }

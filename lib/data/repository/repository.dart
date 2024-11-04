@@ -5,8 +5,10 @@ import '../models/alert_model.dart';
 import '../models/base_model.dart';
 import '../models/dashboard_model.dart';
 import '../models/device_model.dart';
+import '../models/emergency_model.dart';
 import '../models/loginDeviceAuth/post_login_device_auth_resp.dart';
 import '../models/org_detail.dart';
+import '../models/register_model.dart';
 import '../models/user_data_model.dart';
 import '../models/vistors_model.dart';
 
@@ -15,11 +17,10 @@ import '../models/vistors_model.dart';
 /// API request using the [ApiClient] instance
 class Repository {
   final _apiClient = ApiClient();
-  Future<PostLoginDeviceAuthResp> login(
-      {Map<String, dynamic>? formData}) async {
+  Future<AuthResponse> login({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.get(
         baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
-    return PostLoginDeviceAuthResp.fromJson(response.data);
+    return AuthResponse.fromJson(response.data);
   }
 
   Future<DashboardModel> dashboardData({Map<String, dynamic>? formData}) async {
@@ -30,10 +31,12 @@ class Repository {
     return DashboardModel.fromJson(response.data);
   }
 
-  Future<BaseModel> register({Map<String, dynamic>? formData}) async {
+  Future<RegisterModel> register({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.post1(
-        baseUrl: 'https://fyreboxhub.com/api/set_data.php', formdata: formData);
-    return BaseModel.fromJson(response.data);
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return RegisterModel.fromJson(response.data);
   }
 
   Future<UserDataModel> userData({Map<String, dynamic>? formData}) async {
@@ -48,7 +51,38 @@ class Repository {
     return AlertResponse.fromJson(response.data);
   }
 
+  Future<EmergencyModel1> emergencyData(
+      {Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_data.php', formData: formData);
+    return EmergencyModel1.fromJson(response.data);
+  }
+
   Future<BaseModel> addUser({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
+  Future<BaseModel> updateUserDetails({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
+  Future<BaseModel> updateUserPassword({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
+  Future<BaseModel> contactFyreBox({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.post1(
         baseUrl: 'https://fyreboxhub.com/api/set_data.php',
         formdata: formData,
@@ -77,17 +111,29 @@ class Repository {
         baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
     return DeviceResponse.fromJson(response.data);
   }
+
   Future<VistorResponse> vistorData({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.get(
         baseUrl: 'https://fyreboxhub.com/api/get_data.php', formData: formData);
     return VistorResponse.fromJson(response.data);
   }
+
+  Future<BaseModel> deleteVisoterData({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.post1(
+        baseUrl: 'https://fyreboxhub.com/api/set_data.php',
+        formdata: formData,
+        contantType: "application/x-www-form-urlencoded");
+    return BaseModel.fromJson(response.data);
+  }
+
   Future<Organization> orgData({Map<String, dynamic>? formData}) async {
     final response = await _apiClient.get(
-        baseUrl: 'https://fyreboxhub.com/api/get_org_details', formData: formData);
-        evacuationMaps= Organization.fromJson(response.data).dbData?.evacuationMaps??[];
-        helplines= Organization.fromJson(response.data).dbData?.helplines??[];
-        dbData=Organization.fromJson(response.data).dbData;
+        baseUrl: 'https://fyreboxhub.com/api/get_org_details',
+        formData: formData);
+    evacuationMaps =
+        Organization.fromJson(response.data).dbData?.evacuationMaps ?? [];
+    helplines = Organization.fromJson(response.data).dbData?.helplines ?? [];
+    dbData = Organization.fromJson(response.data).dbData;
     return Organization.fromJson(response.data);
   }
 }

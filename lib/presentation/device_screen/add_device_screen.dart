@@ -39,7 +39,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   hintText: '-- Select Device Type --',
                   items: provider.deviceModelObj.deviceTypeDropdownItemList,
                   onChanged: (value) {
-                    provider.setDeviceType(value.title);
+                    provider.setDeviceType(value.id.toString());
                   },
                 ),
                 const SizedBox(height: 16.0),

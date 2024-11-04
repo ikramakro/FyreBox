@@ -29,35 +29,33 @@ class UserScreenState extends State<UserScreen> {
   void initState() {
     super.initState();
   }
-
-  void _showDeleteConfirmationDialog(
-      BuildContext context, DBDATA user, UserProvider provider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete User'),
-          content: const Text('Are you sure you want to delete this user?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform delete action here
-                // provider.deleteUser(user); // Implement deleteUser method in UserProvider
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+void _showDeleteConfirmationDialog(
+    BuildContext context, DBDATA user, UserProvider provider) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Delete User'),
+        content: const Text('Are you sure you want to delete this user?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            onPressed: () async {
+              await provider.deleteUser(user.id.toString());
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void _showUserDetailsBottomSheet(BuildContext context, DBDATA user) {
     showModalBottomSheet(
@@ -360,7 +358,7 @@ class UserDataSource extends DataGridSource {
       required this.onView}) {
     _users = users
         .map<DataGridRow>((user) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'id', value: user.id),
+              DataGridCell<String>(columnName: 'id', value: user.id.toString()),
               DataGridCell<String>(columnName: 'name', value: user.userName),
               DataGridCell<String>(columnName: 'email', value: user.userEmail),
               DataGridCell<String>(
@@ -382,7 +380,7 @@ class UserDataSource extends DataGridSource {
               DataGridCell<DateTime>(
                   columnName: 'regDate',
                   value: DateTime.fromMillisecondsSinceEpoch(
-                      int.parse(user.entryTime ?? '') * 1000)),
+                      int.parse(user.entryTime .toString()?? '') * 1000)),
               DataGridCell<Widget>(
                   columnName: 'actions',
                   value: PopupMenuButton<String>(

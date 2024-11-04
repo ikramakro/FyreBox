@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:fyrebox/core/app_export.dart';
 
+import '../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('Personal Details'),
             onTap: () {
-             NavigatorService.pushNamed(AppRoutes.settingScreen);
+              NavigatorService.pushNamed(AppRoutes.settingScreen);
             },
           ),
           const Divider(), // Adds a divider between items
@@ -23,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
             leading: const Icon(Icons.lock),
             title: const Text('Change Password'),
             onTap: () {
-             NavigatorService.pushNamed(AppRoutes.changePasswordScreen);
+              NavigatorService.pushNamed(AppRoutes.changePasswordScreen);
               // Handle tap for Change Password
             },
           ),
@@ -43,7 +48,7 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Contact Info'),
             onTap: () {
               // Handle tap for Contact Info
-                 NavigatorService.pushNamed(AppRoutes.contactInfoScreen);
+              NavigatorService.pushNamed(AppRoutes.contactInfoScreen);
               // _showContactInfoDialog(context);
             },
           ),
@@ -53,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Organization Logo And Map'),
             onTap: () {
               // Handle tap for Organization Logo
-               NavigatorService.pushNamed(AppRoutes.organizationScreen);
+              NavigatorService.pushNamed(AppRoutes.organizationScreen);
             },
           ),
           // const Divider(),
@@ -76,7 +81,8 @@ class SettingsScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Account'),
-          content: const Text('Are you sure you want to delete your account? This action cannot be undone.'),
+          content: const Text(
+              'Are you sure you want to delete your account? This action cannot be undone.'),
           actions: [
             TextButton(
               child: const Text('Cancel'),
@@ -95,7 +101,7 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
               style: TextButton.styleFrom(
-backgroundColor: Colors.red,
+                backgroundColor: Colors.red,
               ),
               child: const Text('Delete'),
             ),

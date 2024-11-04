@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fyrebox/data/models/alert_model.dart';
 import 'package:fyrebox/presentation/alerts_screen/models/alerts_model.dart';
-import 'package:fyrebox/widgets/custom_text_form_field.dart';
-import 'package:fyrebox/widgets/custom_text_form_field1.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_drop_down.dart';
-import '../../widgets/custom_elevated_button.dart';
+import '../../widgets/custom_radio_button.dart';
 import 'provider/alerts_provider.dart'; // Assuming you have this widget
 
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -17,7 +15,7 @@ class AlertScreen extends StatefulWidget {
   @override
   AlertScreenState createState() => AlertScreenState();
 
-  static Widget builder(BuildContext context) {
+  Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => AlertsProvider(),
       child: const AlertScreen(),
@@ -31,49 +29,49 @@ class AlertScreenState extends State<AlertScreen> {
     super.initState();
   }
 
-  void _showUpdateAlertPopup(BuildContext context, DBDATA alert) {
+  void _showUpdateAlertPopup(
+      BuildContext context, DBDATA alert, AlertsProvider provider) {
+    // final provider = Provider.of<AlertsProvider>(context, listen: false);
+    provider.setSelectedStatus(alert.status);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Update Alert Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16.0),
-              const Text('Alert Status:', style: TextStyle(fontSize: 12.0)),
-              CustomTextFormField1(
-                hintText: alert.alertName,
-              ),
-              // _buildDetailRow('Alert Name:', alert.alertName),
-              const SizedBox(height: 16.0),
-              const Text('Alert Status:', style: TextStyle(fontSize: 12.0)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          content: Consumer<AlertsProvider>(
+            builder: (context, provider, child) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Radio(
-                    value: '1',
-                    groupValue: alert.status,
-                    onChanged: (value) {
-                      setState(() {
-                        alert.status = value as String?;
-                      });
-                    },
+                  const SizedBox(height: 16.0),
+                  const Text('Alert Status:', style: TextStyle(fontSize: 12.0)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomRadioButton(
+                        value: '1',
+                        groupValue: provider.selectedStatus,
+                        text: 'Active',
+                        onChange: (value) {
+                          provider.setSelectedStatus(value);
+                        },
+                      ),
+                      CustomRadioButton(
+                        value: '0',
+                        groupValue: provider.selectedStatus,
+                        text: 'Inactive',
+                        onChange: (value) {
+                          provider.setSelectedStatus(value);
+                        },
+                      ),
+                    ],
                   ),
-                  const Text('Active'),
-                  Radio(
-                    value: '0',
-                    groupValue: alert.status,
-                    onChanged: (value) {
-                      // setState(() {
-                      //   alert.status = value as String?;
-                      // });
-                    },
-                  ),
-                  const Text('Inactive'),
                 ],
-              ),
-            ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -84,7 +82,8 @@ class AlertScreenState extends State<AlertScreen> {
             ),
             TextButton(
               child: const Text('Update'),
-              onPressed: () {
+              onPressed: () async {
+                await provider.updateAlertStatus(alert.id.toString());
                 Navigator.of(context).pop();
               },
             ),
@@ -94,7 +93,8 @@ class AlertScreenState extends State<AlertScreen> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, DBDATA alert) {
+  void _showDeleteConfirmationDialog(
+      BuildContext context, DBDATA alert, AlertsProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -111,9 +111,9 @@ class AlertScreenState extends State<AlertScreen> {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                final provider =
-                    Provider.of<AlertsProvider>(context, listen: false);
-                // provider.deleteAlert(alert);
+                // final provider =
+                //     Provider.of<AlertsProvider>(context, listen: false);
+                provider.deleteAlert(alert.id.toString());
                 Navigator.of(context).pop();
               },
             ),
@@ -225,11 +225,11 @@ class AlertScreenState extends State<AlertScreen> {
                             child: SfDataGrid(
                               source: AlertDataSource(
                                   alerts: provider.model.dBDATA ?? [],
-                                  onUpdate: (alert) =>
-                                      _showUpdateAlertPopup(context, alert),
+                                  onUpdate: (alert) => _showUpdateAlertPopup(
+                                      context, alert, provider),
                                   onDelete: (alert) =>
                                       _showDeleteConfirmationDialog(
-                                          context, alert)),
+                                          context, alert, provider)),
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
@@ -296,7 +296,8 @@ class AlertDataSource extends DataGridSource {
       required this.onDelete}) {
     _alerts = alerts
         .map<DataGridRow>((alert) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'no', value: alert.id),
+              DataGridCell<String>(
+                  columnName: 'no', value: alert.id.toString()),
               DataGridCell<Widget>(
                   columnName: 'color',
                   value: Container(

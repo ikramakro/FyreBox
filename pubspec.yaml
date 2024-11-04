@@ -50,6 +50,8 @@ dependencies:
   flutter_expandable_fab: ^2.2.0
   flutter_speed_dial: ^7.0.0
   sidebarx: ^0.17.1
+  image_picker: ^1.1.2
+  path_provider: ^2.1.4
 
 dev_dependencies:
   flutter_test:

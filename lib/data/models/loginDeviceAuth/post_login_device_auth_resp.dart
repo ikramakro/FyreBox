@@ -1,32 +1,43 @@
-class PostLoginDeviceAuthResp {
-  String? sTATUS;
-  String? dESCRIPTION;
-  USERDATA? uSERDATA;
+class AuthResponse {
+  String? status;
+  String? jwt;
+  String? description;
+  USERDATA? userData;
   String? errorDescription;
 
-  PostLoginDeviceAuthResp(
-      {this.sTATUS, this.dESCRIPTION, this.uSERDATA, this.errorDescription});
+  AuthResponse(
+      {this.status,
+      this.jwt,
+      this.description,
+      this.userData,
+      this.errorDescription});
 
-  PostLoginDeviceAuthResp.fromJson(Map<String, dynamic> json) {
-    sTATUS = json['STATUS'];
-    dESCRIPTION = json['DESCRIPTION'];
+  AuthResponse.fromJson(Map<String, dynamic> json) {
+    status = json['STATUS'];
+    jwt =
+        json['JWT']; // Only present in one class, included here for flexibility
+    description = json['DESCRIPTION'];
     if (json['STATUS'] != 'ERROR') {
-      uSERDATA = json['USER_DATA'] != null
+      userData = json['USER_DATA'] != null
           ? USERDATA.fromJson(json['USER_DATA'])
           : null;
       errorDescription = null;
     } else {
-      uSERDATA = null;
+      userData = null;
       errorDescription = json['ERROR_DESCRIPTION'];
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['STATUS'] = sTATUS;
-    data['DESCRIPTION'] = dESCRIPTION;
-    if (uSERDATA != null) {
-      data['USER_DATA'] = uSERDATA!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['STATUS'] = status;
+    data['JWT'] = jwt;
+    data['DESCRIPTION'] = description;
+    if (userData != null) {
+      data['USER_DATA'] = userData!.toJson();
+    }
+    if (errorDescription != null) {
+      data['ERROR_DESCRIPTION'] = errorDescription;
     }
     return data;
   }
@@ -34,14 +45,14 @@ class PostLoginDeviceAuthResp {
 
 class USERDATA {
   String? accountType;
-  String? id;
-  String? orgId;
+  dynamic id;
+  dynamic orgId;
   String? userName;
   String? orgAdmin;
   String? userEmail;
-  String? userRole;
+  dynamic userRole;
   String? status;
-  String? entryTime;
+  dynamic entryTime;
   String? roleName;
   String? orgName;
   String? orgStatus;
@@ -88,7 +99,7 @@ class USERDATA {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['account_type'] = accountType;
     data['id'] = id;
     data['org_id'] = orgId;

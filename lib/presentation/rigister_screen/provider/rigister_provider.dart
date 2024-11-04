@@ -37,7 +37,8 @@ class RigisterProvider extends ChangeNotifier {
         'client_email': userNameController.text,
         'client_password': passwordController.text,
         'client_re_password': confirmPasswordController.text,
-        'operation': 'register_client'
+        'operation': 'register_client',
+        'client_terms_and_condition': ''
       },
     ).then((value) async {
       // postLoginDeviceAuthResp = value;

@@ -55,6 +55,18 @@ class PrefUtils {
     }
   }
 
+  Future<void> setAccessToken(String token) async {
+    await _sharedPreferences!.setString('token', token);
+  }
+
+  String? getAccessToken() {
+    String? token = _sharedPreferences!.getString('token');
+    if (token != null) {
+      return token;
+    }
+    return null;
+  }
+
   // Add methods to store and retrieve USERDATA
   Future<void> setUserData(USERDATA userData) async {
     String userDataJson = jsonEncode(userData.toJson());

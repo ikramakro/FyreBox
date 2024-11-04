@@ -19,7 +19,7 @@ class ContactInfoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact Info'),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Color(0xffd61a21),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -74,7 +74,7 @@ class ContactInfoScreen extends StatelessWidget {
                 },
                 text: 'Add Info',
                 buttonStyle: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
+                  backgroundColor: MaterialStateProperty.all(Color(0xffd61a21)),
                   padding: MaterialStateProperty.all(
                     const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
                   ),

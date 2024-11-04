@@ -3,6 +3,7 @@ import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
 import '../../../data/models/alert_model.dart';
+import '../../../data/models/emergency_model.dart';
 import '../../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
 import '../../../data/repository/repository.dart';
 import '../models/emergency_model.dart';
@@ -10,7 +11,7 @@ import '../models/emergency_model.dart';
 class EmergencyProvider extends ChangeNotifier {
   EmergencyModel alertModel = EmergencyModel();
 
-  AlertResponse model = AlertResponse();
+  EmergencyModel1 model = EmergencyModel1();
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
@@ -20,20 +21,18 @@ class EmergencyProvider extends ChangeNotifier {
   }
 
   init() async {
-    await loadAlertData();
+    await loadEmergencyData();
   }
 
-  FutureOr<void> loadAlertData({
+  FutureOr<void> loadEmergencyData({
     Function? onSuccess,
     Function? onError,
   }) async {
     USERDATA userdata = prefUtils.getUserData()!;
 
-    await _repository.alertData(
+    await _repository.emergencyData(
       formData: {
-        'operation': 'get_alerts',
-        'access_token': 'developer_bypass',
-        'user_id': userdata.orgId
+        'operation': 'get_helplines',
       },
     ).then((value) async {
       model = value;
@@ -45,69 +44,12 @@ class EmergencyProvider extends ChangeNotifier {
     });
   }
 
-  // void onChanged(String value) async {
-  //   // For filtered data
-  //   String org = await prefUtils.getOrgValue('orgid');
-
-  //   if (value == 'Active') {
-  //     await _repository.deviceData(
-  //       formData: {
-  //         'operation': 'get_devices',
-  //         'access_token': 'developer_bypass',
-  //         'org_id': org,
-  //         'status': '1'
-  //       },
-  //     ).then((value) async {
-  //       model = value;
-  //       if (model.status != "ERROR") {
-  //         notifyListeners();
-  //       } else {
-  //         showError(model.errorDescription ?? '');
-  //       }
-  //     });
-  //   } else if (value == 'In-Active') {
-  //     await _repository.deviceData(
-  //       formData: {
-  //         'operation': 'get_devices',
-  //         'access_token': 'developer_bypass',
-  //         'org_id': org,
-  //         'status': '0'
-  //       },
-  //     ).then((value) async {
-  //       model = value;
-  //       if (model.status != "ERROR") {
-  //         notifyListeners();
-  //       } else {
-  //         showError(model.errorDescription ?? '');
-  //       }
-  //     });
-  //   } else {
-  //     await _repository.deviceData(
-  //       formData: {
-  //         'operation': 'get_devices',
-  //         'access_token': 'developer_bypass',
-  //         'org_id': org,
-  //       },
-  //     ).then((value) async {
-  //       model = value;
-  //       if (model.status != "ERROR") {
-  //         notifyListeners();
-  //       } else {
-  //         showError(model.errorDescription ?? '');
-  //       }
-  //     });
-  //   }
-  //   notifyListeners();
-  // }
   void onChanged(String value) async {
     USERDATA userdata = prefUtils.getUserData()!;
 
-    await _repository.alertData(
+    await _repository.emergencyData(
       formData: {
-        'operation': 'get_alerts',
-        'access_token': 'developer_bypass',
-        'org_id': userdata.orgId,
-        'status': value == 'Active' ? '1' : '0'
+        'operation': 'get_helplines',
       },
     ).then((value) async {
       model = value;
@@ -119,6 +61,57 @@ class EmergencyProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> addHelpline({
+    required String name,
+    required String type,
+    required String phone,
+    required String address,
+    required String status,
+  }) async {
+    USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'add_helpline',
+        'access_token': 'developer_bypass',
+        'name': name,
+        'type': type,
+        'phone': phone,
+        'address': address,
+        'status': status,
+        'user_id': userdata.orgId
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? 'Helpline added successfully.');
+        await loadEmergencyData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error adding helpline.');
+      }
+    });
+  }
+
+  Future<void> deleteHelpline(
+    String id,
+  ) async {
+    USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'delete_helpline',
+        'id': id,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        model.dBDATA?.removeWhere((visitor) => visitor.id.toString() == id);
+        showSuccess(value.dESCRIPTION ?? '');
+        notifyListeners();
+        await loadEmergencyData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error updating alert status.');
+      }
+    });
+  }
   // Future<void> updateAlert(DBData alert) async {
   //   await _repository.updateAlert(
   //     formData: {

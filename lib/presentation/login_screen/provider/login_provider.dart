@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fyrebox/core/utils/constant.dart';
+import 'package:fyrebox/core/utils/shared_prf.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
 import '../../../data/repository/repository.dart';
@@ -11,7 +12,7 @@ class LoginProvider extends ChangeNotifier {
   // LoginModel loginModelObj = LoginModel();
   bool isShowPassword = true;
   final _repository = Repository();
-  var postLoginDeviceAuthResp = PostLoginDeviceAuthResp();
+  var postLoginDeviceAuthResp = AuthResponse();
 
   @override
   void dispose() {
@@ -37,12 +38,11 @@ class LoginProvider extends ChangeNotifier {
       },
     ).then((value) async {
       postLoginDeviceAuthResp = value;
-      if (postLoginDeviceAuthResp.sTATUS != "ERROR") {
+      if (postLoginDeviceAuthResp.status != "ERROR") {
         PrefUtils prefUtils = PrefUtils();
-        // sp.saveToDisk('orgid', postLoginDeviceAuthResp.uSERDATA?.orgId ?? '');
         await prefUtils
-            .setUserData(postLoginDeviceAuthResp.uSERDATA ?? USERDATA());
-        await prefUtils.setBoolValue('isLogin', true);
+            .setUserData(postLoginDeviceAuthResp.userData ?? USERDATA());
+        await prefUtils.setAccessToken(postLoginDeviceAuthResp.jwt ?? '');
 
         onSuccess!.call();
         notifyListeners();

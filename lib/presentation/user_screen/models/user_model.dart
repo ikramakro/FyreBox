@@ -24,7 +24,7 @@ class UserModel {
     ),
     SelectionPopupModel(
       id: 1,
-      title: "Agent",
+      title: "User",
       isSelected: true,
     ),
   ];

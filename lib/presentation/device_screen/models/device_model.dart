@@ -44,6 +44,21 @@ class DeviceModel {
       title: "Intefration Unit",
       isSelected: true,
     ),
+    SelectionPopupModel(
+      id: 1,
+      title: "Multi Detector",
+      isSelected: true,
+    ),
+    SelectionPopupModel(
+      id: 1,
+      title: "Repeat Speaker",
+      isSelected: true,
+    ),
+    SelectionPopupModel(
+      id: 1,
+      title: "Fyrebox compact unit",
+      isSelected: true,
+    ),
   ];
   List<ActionsItemModel> actionsItemList =
       List.generate(2, (index) => ActionsItemModel());

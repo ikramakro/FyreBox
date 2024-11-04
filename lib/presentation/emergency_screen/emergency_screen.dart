@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:fyrebox/data/models/emergency_model.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import '../../core/app_export.dart';
-import '../../core/utils/constant.dart';
-import '../../data/models/org_detail.dart';
 import '../../widgets/custom_text_form_field1.dart';
+import 'provider/emergency_provider.dart';
 
 import 'package:syncfusion_flutter_core/theme.dart';
+
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
 
   @override
   _EmergencyScreenState createState() => _EmergencyScreenState();
-
-
 }
 
 class _EmergencyScreenState extends State<EmergencyScreen> {
@@ -24,7 +23,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     super.initState();
   }
 
-  void _showUpdateHelplinePopup(BuildContext context, Helpline helpline) {
+  // Method to show the update helpline popup
+  void _showUpdateHelplinePopup(BuildContext context, DBDATA helpline) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -45,19 +45,21 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 children: [
                   Radio(
                     value: '1',
-                    groupValue: helpline.id,
+                    groupValue: helpline.status,
                     onChanged: (value) {
                       setState(() {
-                        helpline.id = value as String?;
+                        helpline.status = value;
                       });
                     },
                   ),
                   const Text('Active'),
                   Radio(
                     value: '0',
-                    groupValue: helpline.id,
+                    groupValue: helpline.status,
                     onChanged: (value) {
-                      // Update your logic here
+                      setState(() {
+                        helpline.status = value;
+                      });
                     },
                   ),
                   const Text('Inactive'),
@@ -75,6 +77,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             TextButton(
               child: const Text('Update'),
               onPressed: () {
+                // Call the provider update method
+                final provider =
+                    Provider.of<EmergencyProvider>(context, listen: false);
+                // provider.updateHelpline(helpline); // Update the helpline
                 Navigator.of(context).pop();
               },
             ),
@@ -84,7 +90,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, Helpline helpline) {
+  // Method to show the delete confirmation dialog
+  void _showDeleteConfirmationDialog(
+      BuildContext context, DBDATA helpline, EmergencyProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -101,9 +109,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                // final provider =
-                //     Provider.of<AlertsProvider>(context, listen: false);
-                // provider.deleteHelpline(helpline); // Implement this in the provider
+                provider.deleteHelpline(helpline.id.toString());
                 Navigator.of(context).pop();
               },
             ),
@@ -115,85 +121,92 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: Container(
-          width: double.maxFinite,
-          height: double.maxFinite,
-          decoration: BoxDecoration(
-            color: appTheme.whiteA700,
+    return ChangeNotifierProvider(
+      create: (context) => EmergencyProvider(),
+      child: SafeArea(
+        child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              NavigatorService.pushNamed(AppRoutes.addHelplineScreen);
+            },
+            backgroundColor: Colors.red,
+            child: const Icon(Icons.add),
           ),
-          child: Column(
-            children: [
-           
-              SizedBox(width: 20.h),
-              const Divider(),
-              
-                if (helplines != null ||
-                    helplines!.isNotEmpty) ...[ Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: SfDataGridTheme(
-                      data: SfDataGridThemeData(
-                          headerColor: appTheme.deepOrangeA100,
-                          gridLineColor: appTheme.pink300),
-                      child: SfDataGrid(
-                        source: HelplineDataSource(
-                            helplines: helplines!,
-                            onUpdate: (helpline) =>
-                                _showUpdateHelplinePopup(
-                                    context, helpline),
-                            onDelete: (helpline) =>
-                                _showDeleteConfirmationDialog(
-                                    context, helpline)),
-                        gridLinesVisibility: GridLinesVisibility.both,
-                        headerGridLinesVisibility:
-                            GridLinesVisibility.both,
-                        columnWidthMode: ColumnWidthMode.fitByCellValue,
-                        onQueryRowHeight: (details) {
-                          return 30;
-                        },
-                        columns: <GridColumn>[
-                          GridColumn(
-                            columnName: 'no',
-                            label: const Center(child: Text('No')),
+          body: Consumer<EmergencyProvider>(
+            builder: (context, provider, child) {
+              if (provider.model.dBDATA == null ||
+                  provider.model.dBDATA!.isEmpty) {
+                return const Center(
+                  child: Text('No helplines found'),
+                );
+              }
+              return SizedBox(
+                width: double.maxFinite,
+                height: double.maxFinite,
+                child: Column(
+                  children: [
+                    const Divider(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: SfDataGridTheme(
+                          data: SfDataGridThemeData(
+                              headerColor: appTheme.deepOrangeA100,
+                              gridLineColor: appTheme.pink300),
+                          child: SfDataGrid(
+                            source: HelplineDataSource(
+                              helplines: provider.model.dBDATA!,
+                              onUpdate: (helpline) =>
+                                  _showUpdateHelplinePopup(context, helpline),
+                              onDelete: (helpline) =>
+                                  _showDeleteConfirmationDialog(
+                                      context, helpline, provider),
+                            ),
+                            gridLinesVisibility: GridLinesVisibility.both,
+                            headerGridLinesVisibility: GridLinesVisibility.both,
+                            columnWidthMode: ColumnWidthMode.fitByCellValue,
+                            columns: <GridColumn>[
+                              GridColumn(
+                                columnName: 'no',
+                                label: const Center(child: Text('No')),
+                              ),
+                              GridColumn(
+                                columnName: 'name',
+                                label: const Center(child: Text('Name')),
+                              ),
+                              GridColumn(
+                                columnName: 'type',
+                                label: const Center(child: Text('Type')),
+                              ),
+                              GridColumn(
+                                columnName: 'phone',
+                                label: const Center(child: Text('Phone')),
+                              ),
+                              GridColumn(
+                                columnName: 'address',
+                                label: const Center(child: Text('Address')),
+                              ),
+                              GridColumn(
+                                columnName: 'status',
+                                label: const Center(child: Text('Status')),
+                              ),
+                              GridColumn(
+                                columnName: 'entryTime',
+                                label: const Center(child: Text('Entry Time')),
+                              ),
+                              GridColumn(
+                                columnName: 'actions',
+                                label: const Center(child: Text('Actions')),
+                              ),
+                            ],
                           ),
-                          GridColumn(
-                              columnName: 'name',
-                              label:
-                                  const Center(child: Text('Name'))),
-                          GridColumn(
-                              columnName: 'type',
-                              label: const Center(child: Text('Type'))),
-                          GridColumn(
-                              columnName: 'phone',
-                              label:
-                                  const Center(child: Text('Phone'))),
-                          GridColumn(
-                              columnName: 'address',
-                              label: const Center(child: Text('Address'))),
-                          GridColumn(
-                              columnName: 'status',
-                              label:
-                                  const Center(child: Text('Status'))),
-                          GridColumn(
-                              columnName: 'entryTime',
-                              label: const Center(
-                                  child: Text('Entry Time'))),
-                          GridColumn(
-                              columnName: 'actions',
-                              label:
-                                  const Center(child: Text('Actions'))),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                )
-             ]
-              
-            ],
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -203,18 +216,22 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
 class HelplineDataSource extends DataGridSource {
   HelplineDataSource({
-    required List<Helpline> helplines,
+    required List<DBDATA> helplines,
     required this.onUpdate,
     required this.onDelete,
   }) {
     _helplines = helplines
         .map<DataGridRow>((helpline) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'no', value: helpline.id),
-              DataGridCell<String>(columnName: 'name', value: helpline.name),
-              DataGridCell<String>(columnName: 'type', value: helpline.type),
-              DataGridCell<String>(columnName: 'phone', value: helpline.phone),
               DataGridCell<String>(
-                  columnName: 'address', value: helpline.address),
+                  columnName: 'no', value: helpline.id.toString()),
+              DataGridCell<String>(
+                  columnName: 'name', value: helpline.name ?? ''),
+              DataGridCell<String>(
+                  columnName: 'type', value: helpline.type ?? ''),
+              DataGridCell<String>(
+                  columnName: 'phone', value: helpline.phone ?? ''),
+              DataGridCell<String>(
+                  columnName: 'address', value: helpline.address ?? ''),
               DataGridCell<Widget>(
                   columnName: 'status',
                   value: FlutterSwitch(
@@ -222,19 +239,19 @@ class HelplineDataSource extends DataGridSource {
                     height: 25.0,
                     valueFontSize: 12.0,
                     toggleSize: 18.0,
-                    value: true,
+                    value: helpline.status == '1',
                     borderRadius: 20.0,
                     padding: 2.0,
                     showOnOff: true,
                     onToggle: (val) {
-                      // Handle toggle action
+                      // You can handle status update here
                     },
                   )),
               DataGridCell<String>(
                   columnName: 'entryTime',
                   value: DateFormat('MM/dd/yyyy HH:mm').format(
                       DateTime.fromMillisecondsSinceEpoch(
-                          int.parse(helpline.id ?? '0') * 1000))),
+                          helpline.entryTime ?? 0))),
               DataGridCell<Widget>(
                   columnName: 'actions',
                   value: PopupMenuButton<String>(
@@ -259,8 +276,8 @@ class HelplineDataSource extends DataGridSource {
   }
 
   List<DataGridRow> _helplines = [];
-  final Function(Helpline) onUpdate;
-  final Function(Helpline) onDelete;
+  final Function(DBDATA) onUpdate;
+  final Function(DBDATA) onDelete;
 
   @override
   List<DataGridRow> get rows => _helplines;

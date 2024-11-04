@@ -4,7 +4,7 @@ import '../../../../core/app_export.dart';
 import 'provider/splash_provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   SplashScreenState createState() => SplashScreenState();
@@ -30,16 +30,16 @@ class SplashScreenState extends State<SplashScreen> {
 
   void _loadData() async {
     // Load the data in the provider
-     bool isLogin = prefUtils.getBoolValue('isLogin');
-  //   final splashProvider = Provider.of<SplashProvider>(context, listen: false);
-  //  if(isLogin){
-  //   await splashProvider.loadInitialData();
-  //  } 
+    String? isLogin = prefUtils.getAccessToken();
+    //   final splashProvider = Provider.of<SplashProvider>(context, listen: false);
+    //  if(isLogin){
+    //   await splashProvider.loadInitialData();
+    //  }
 
     // Navigate after a delay
     await Future.delayed(const Duration(milliseconds: 3000));
     NavigatorService.popAndPushNamed(
-      isLogin ? AppRoutes.rootScreen : AppRoutes.loginScreen,
+      isLogin != null ? AppRoutes.rootScreen : AppRoutes.loginScreen,
     );
   }
 

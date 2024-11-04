@@ -16,7 +16,7 @@ class DeviceScreen extends StatefulWidget {
   @override
   DeviceScreenState createState() => DeviceScreenState();
 
-  static Widget builder(BuildContext context) {
+  Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => DeviceProvider(),
       child: const DeviceScreen(),
@@ -32,13 +32,13 @@ class DeviceScreenState extends State<DeviceScreen> {
 
   final _key = GlobalKey<ExpandableFabState>();
   void _showDeleteConfirmationDialog(
-      BuildContext context, DBData user, DeviceProvider provider) {
+      BuildContext context, DBData device, DeviceProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete User'),
-          content: const Text('Are you sure you want to delete this user?'),
+          title: const Text('Delete Device'),
+          content: const Text('Are you sure you want to delete this device?'),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
@@ -48,10 +48,63 @@ class DeviceScreenState extends State<DeviceScreen> {
             ),
             TextButton(
               child: const Text('Delete'),
-              onPressed: () {
-                // Perform delete action here
-                // provider.deleteUser(user); // Implement deleteUser method in UserProvider
+              onPressed: () async {
+                await provider.deleteDevice(device.id.toString());
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showUpdateDeviceDialog(
+      BuildContext context, DBData device, DeviceProvider provider) {
+    // Pre-fill the controllers with the current device values
+    provider.deviceTypeController.text = device.deviceTypeName ?? '';
+    provider.deviceLocationController.text = device.deviceLocation ?? '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Device'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Dropdown for device type
+                CustomDropDown(
+                  hintText: '-- Select Device Type --',
+                  items: provider.deviceModelObj.deviceTypeDropdownItemList,
+                  onChanged: (value) {
+                    provider.setDeviceType(value.id.toString());
+                  },
+                ),
+
+                // TextField for updating device location
+                TextField(
+                  controller: provider.deviceLocationController,
+                  decoration:
+                      const InputDecoration(labelText: 'Device Location'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () async {
+                // Call the update device function here
+                await provider.updateDevice(device.id.toString());
+                Navigator.of(context).pop(); // Close the dialog after updating
               },
             ),
           ],
@@ -77,7 +130,7 @@ class DeviceScreenState extends State<DeviceScreen> {
                       style: CustomTextStyles
                           .headlineSmallMontserratBluegray90001),
                   const SizedBox(height: 10),
-                  _buildDetailRow('Device ID', device.id),
+                  _buildDetailRow('Device ID', device.id.toString()),
                   _buildDetailRow('Device Key', device.deviceKey),
                   _buildDetailRow('Device Type', device.deviceTypeName),
                   _buildDetailRow('Location', device.deviceLocation),
@@ -94,7 +147,8 @@ class DeviceScreenState extends State<DeviceScreen> {
                   _buildDetailRow('Name', device.mfrName),
                   _buildDetailRow('Contact', device.mfrContact),
                   _buildDetailRow('Email', device.mfrEmail),
-                  _buildDetailRow('Mfr Date', _formatTimestamp(device.mfrDate)),
+                  _buildDetailRow(
+                      'Mfr Date', _formatTimestamp(device.mfrDate.toString())),
                   _buildDetailRow('Serial Number', device.mfrSerialNo),
                 ],
               ),
@@ -164,6 +218,15 @@ class DeviceScreenState extends State<DeviceScreen> {
                     NavigatorService.pushNamed(AppRoutes.orderDeviceScreen);
                   },
                 ),
+                // SpeedDialChild(
+                // child: const Icon(Icons.add),
+                // backgroundColor: Colors.red,
+                // foregroundColor: Colors.white,
+                // label: 'Add Device Type',
+                // onTap: () {
+                // NavigatorService.pushNamed(AppRoutes.orderDeviceScreen);
+                // },
+                // ),
               ]),
           // floatingActionButton: FloatingActionButton(
           //   onPressed: () {
@@ -223,6 +286,11 @@ class DeviceScreenState extends State<DeviceScreen> {
                               },
                             ),
                           ),
+                          TextButton(
+                              onPressed: () {
+                                provider.downloadFile();
+                              },
+                              child: const Text('Download CheckList'))
                         ],
                       ),
                     ),
@@ -249,7 +317,9 @@ class DeviceScreenState extends State<DeviceScreen> {
                                           context, device, provider),
                                   onView: (device) =>
                                       _showDeviceDetailsBottomSheet(
-                                          context, device)),
+                                          context, device),
+                                  onUpdate: (device) => _showUpdateDeviceDialog(
+                                      context, device, provider)),
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
@@ -310,10 +380,12 @@ class DeviceDataSource extends DataGridSource {
   DeviceDataSource(
       {required List<DBData> devices,
       required this.onDelete,
-      required this.onView}) {
+      required this.onView,
+      required this.onUpdate}) {
     _devices = devices
         .map<DataGridRow>((device) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'no', value: device.id),
+              DataGridCell<String>(
+                  columnName: 'no', value: device.id.toString()),
               DataGridCell<String>(
                   columnName: 'name', value: device.deviceName ?? ''),
               DataGridCell<String>(
@@ -343,12 +415,15 @@ class DeviceDataSource extends DataGridSource {
                       } else if (value == 'Delete') {
                         onDelete(device);
                       } else if (value == 'Update') {
-                        // Add your update logic here
+                        onUpdate(device);
                       }
                     },
                     itemBuilder: (BuildContext context) {
-                      return {'View', 'Delete', 'Update', 'Checklist'}
-                          .map((String choice) {
+                      return {
+                        'View',
+                        'Delete',
+                        'Update',
+                      }.map((String choice) {
                         return PopupMenuItem<String>(
                           value: choice,
                           child: Text(choice),
@@ -363,6 +438,7 @@ class DeviceDataSource extends DataGridSource {
   List<DataGridRow> _devices = [];
   final Function(DBData) onDelete;
   final Function(DBData) onView;
+  final Function(DBData) onUpdate;
 
   @override
   List<DataGridRow> get rows => _devices;

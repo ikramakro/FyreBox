@@ -1,130 +1,134 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_switch/flutter_switch.dart';
-// import 'package:fyrebox/core/app_export.dart';
-// import 'package:fyrebox/widgets/custom_text_form_field1.dart';
-// import 'package:intl/intl.dart';
-// import '../../widgets/custom_drop_down.dart';
-// import '../../widgets/custom_elevated_button.dart';
-// import 'provider/alerts_provider.dart'; // Assuming you have this widget
+import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
+import '../../../widgets/custom_elevated_button.dart';
+import '../../../widgets/custom_text_form_field1.dart';
+import '../../core/app_export.dart';
+import 'provider/vistor_provider.dart';
 
-// class AddDeviceScreen extends StatefulWidget {
-//   const AddDeviceScreen({super.key});
+class AddVisitorScreen extends StatefulWidget {
+  const AddVisitorScreen({super.key});
 
-//   @override
-//   _AddDeviceScreenState createState() => _AddDeviceScreenState();
+  @override
+  _AddVisitorScreenState createState() => _AddVisitorScreenState();
+  static Widget builder(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => VisitorProvider(),
+      child: const AddVisitorScreen(),
+    );
+  }
+}
 
-//   static Widget builder(BuildContext context) {
-//     return ChangeNotifierProvider(
-//       create: (context) => AlertsProvider(),
-//       child: const AddDeviceScreen(),
-//     );
-//   }
-// }
+class _AddVisitorScreenState extends State<AddVisitorScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  bool isActive = true;
 
-// class _AddDeviceScreenState extends State<AddDeviceScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Add Device'),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: SingleChildScrollView(
-//           child: Consumer<AlertsProvider>(builder: (context, provider, child) {
-//             return Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 CustomDropDown(
-//                   hintText: '-- Select Device Type --',
-//                   items: provider.deviceModelObj.deviceTypeDropdownItemList,
-//                   onChanged: (value) {
-//                     provider.setDeviceType(value.title);
-//                   },
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.deviceNameController,
-//                   hintText: 'Device Name',
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.siteNameController,
-//                   hintText: 'Site Name',
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.deviceLocationController,
-//                   hintText: 'Device Location',
-//                 ),
-//                 const SizedBox(height: 24.0),
-//                 const Text('Manufacturer Details',
-//                     style:
-//                         TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.mfrNameController,
-//                   hintText: 'Name',
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.mfrContactController,
-//                   hintText: 'Contact',
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.mfrEmailController,
-//                   hintText: 'Email',
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 GestureDetector(
-//                   onTap: () async {
-//                     DateTime? pickedDate = await showDatePicker(
-//                       context: context,
-//                       initialDate: DateTime.now(),
-//                       firstDate: DateTime(1900),
-//                       lastDate: DateTime(2101),
-//                     );
-//                     if (pickedDate != null) {
-//                       provider.setMfrDate(
-//                           DateFormat('MM/dd/yyyy').format(pickedDate));
-//                     }
-//                   },
-//                   child: AbsorbPointer(
-//                     child: CustomTextFormField1(
-//                       controller: provider.mfrDateController,
-//                       hintText: 'Date Of Manufacture: mm/dd/yyyy',
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16.0),
-//                 CustomTextFormField1(
-//                   controller: provider.serialNumberController,
-//                   hintText: 'Serial Number',
-//                 ),
-//                 const SizedBox(height: 24.0),
-//                 CustomElevatedButton(
-//                   buttonStyle: ButtonStyle(
-//                       backgroundColor:
-//                           WidgetStateProperty.all(appTheme.deepOrangeA100)),
-//                   onPressed: () {
-//                     // provider.addDevice();
-//                   },
-//                   text: 'Add Device',
-//                   height: 50,
-//                   width: double.infinity,
-//                 ),
-//               ],
-//             );
-//           }),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class SelectionPopupModel {
-//   final String title;
-
-//   SelectionPopupModel({required this.title});
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Visitor'),
+        backgroundColor: const Color(0xffd61a21),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            const SizedBox(height: 24.0),
+            const Text(
+              'Name',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            CustomTextFormField1(
+              controller: nameController,
+              hintText: 'Enter visitor\'s name',
+              borderDecoration: const OutlineInputBorder(),
+              // //contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Surname',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            CustomTextFormField1(
+              controller: surnameController,
+              hintText: 'Enter visitor\'s surname',
+              borderDecoration: const OutlineInputBorder(),
+              //contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Visitor\'s Email',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            CustomTextFormField1(
+              controller: emailController,
+              hintText: 'Enter visitor\'s email',
+              borderDecoration: const OutlineInputBorder(),
+              //contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Visitor\'s Phone',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            CustomTextFormField1(
+              controller: phoneController,
+              hintText: 'Enter visitor\'s phone',
+              borderDecoration: const OutlineInputBorder(),
+              //contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Status',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Active'),
+                FlutterSwitch(
+                  height: 30.0,
+                  width: 60.0,
+                  padding: 4.0,
+                  toggleSize: 20.0,
+                  borderRadius: 15.0,
+                  activeColor: const Color(0xffd61a21),
+                  value: isActive,
+                  onToggle: (value) {
+                    setState(() {
+                      isActive = value;
+                    });
+                  },
+                ),
+                const Text('Inactive'),
+              ],
+            ),
+            const SizedBox(height: 24.0),
+            Center(
+              child: CustomElevatedButton(
+                onPressed: () {
+                  // Handle save action
+                },
+                text: 'Add Visitor',
+                buttonStyle: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32.0, vertical: 12.0),
+                  textStyle: const TextStyle(fontSize: 16.0),
+                  backgroundColor: const Color(0xffd61a21),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

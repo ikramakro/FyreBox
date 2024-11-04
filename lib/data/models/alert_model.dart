@@ -21,22 +21,15 @@ class AlertResponse {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['STATUS'] = sTATUS;
-    if (dBDATA != null) {
-      data['DB_DATA'] = dBDATA!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+ 
 }
 
 class DBDATA {
-  String? id;
-  String? deviceId;
-  String? alertType;
+  int? id;
+  int? deviceId;
+  int? alertType;
   String? status;
-  String? entryTime;
+  int? entryTime;
   String? alertName;
   String? alertColor;
   String? alertDescription;
@@ -69,21 +62,5 @@ class DBDATA {
     orgName = json['org_name'];
     deviceKey = json['device_key'];
     entryTimeFormated = json['entry_time_formated'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['device_id'] = deviceId;
-    data['alert_type'] = alertType;
-    data['status'] = status;
-    data['entry_time'] = entryTime;
-    data['alert_name'] = alertName;
-    data['alert_color'] = alertColor;
-    data['alert_description'] = alertDescription;
-    data['org_name'] = orgName;
-    data['device_key'] = deviceKey;
-    data['entry_time_formated'] = entryTimeFormated;
-    return data;
   }
 }

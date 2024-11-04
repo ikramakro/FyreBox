@@ -14,7 +14,7 @@ class VistorScreen extends StatefulWidget {
   @override
   VistorScreenState createState() => VistorScreenState();
 
-  static Widget builder(BuildContext context) {
+  Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => VisitorProvider(),
       child: const VistorScreen(),
@@ -52,7 +52,7 @@ class VistorScreenState extends State<VistorScreen> {
                     groupValue: visitor.status,
                     onChanged: (value) {
                       setState(() {
-                        visitor.status = value as String?;
+                        visitor.status = value;
                       });
                     },
                   ),
@@ -62,7 +62,7 @@ class VistorScreenState extends State<VistorScreen> {
                     groupValue: visitor.status,
                     onChanged: (value) {
                       setState(() {
-                        visitor.status = value as String?;
+                        visitor.status = value;
                       });
                     },
                   ),
@@ -90,7 +90,8 @@ class VistorScreenState extends State<VistorScreen> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, DBDATA visitor) {
+  void _showDeleteConfirmationDialog(
+      BuildContext context, DBDATA visitor, VisitorProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -107,9 +108,7 @@ class VistorScreenState extends State<VistorScreen> {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                final provider =
-                    Provider.of<VisitorProvider>(context, listen: false);
-                // provider.deleteVisitor(visitor);
+                provider.deleteVisitorData(id: visitor.id.toString());
                 Navigator.of(context).pop();
               },
             ),
@@ -145,6 +144,13 @@ class VistorScreenState extends State<VistorScreen> {
       create: (context) => VisitorProvider(),
       child: SafeArea(
         child: Scaffold(
+          // floatingActionButton: FloatingActionButton(
+          // onPressed: () {
+          // NavigatorService.pushNamed(AppRoutes.addVisitorScreen);
+          // },
+          // backgroundColor: Colors.red,
+          // child: const Icon(Icons.add),
+          // ),
           extendBody: true,
           extendBodyBehindAppBar: true,
           body: Consumer<VisitorProvider>(
@@ -213,12 +219,13 @@ class VistorScreenState extends State<VistorScreen> {
                                 gridLineColor: appTheme.pink300),
                             child: SfDataGrid(
                               source: VisitorDataSource(
-                                  visitors: provider.model.dBDATA ?? [],
-                                  onUpdate: (visitor) =>
-                                      _showUpdateVisitorPopup(context, visitor),
-                                  onDelete: (visitor) =>
-                                      _showDeleteConfirmationDialog(
-                                          context, visitor)),
+                                visitors: provider.model.dBDATA ?? [],
+                                onUpdate: (visitor) =>
+                                    _showUpdateVisitorPopup(context, visitor),
+                                onDelete: (visitor) =>
+                                    _showDeleteConfirmationDialog(
+                                        context, visitor, provider),
+                              ),
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
@@ -274,7 +281,8 @@ class VisitorDataSource extends DataGridSource {
       required this.onDelete}) {
     _visitors = visitors
         .map<DataGridRow>((visitor) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'no', value: visitor.id),
+              DataGridCell<String>(
+                  columnName: 'no', value: visitor.id.toString()),
               DataGridCell<String>(
                   columnName: 'visitorName', value: visitor.visitorName),
               DataGridCell<String>(
@@ -286,12 +294,11 @@ class VisitorDataSource extends DataGridSource {
                         ? Colors.lightGreen
                         : Colors.red.withOpacity(.5),
                     child: Center(
-                        child:
-                            Text(visitor.status == '1' ? 'Active' : 'Inactive')),
+                        child: Text(
+                            visitor.status == '1' ? 'Active' : 'Inactive')),
                   )),
               DataGridCell<String>(
-                  columnName: 'entryTime',
-                  value: visitor.entryTimeFormated),
+                  columnName: 'entryTime', value: visitor.entryTimeFormated),
               DataGridCell<Widget>(
                   columnName: 'actions',
                   value: PopupMenuButton<String>(

@@ -23,27 +23,27 @@ class UserDataModel {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['STATUS'] = sTATUS;
-    if (dBDATA != null) {
-      data['DB_DATA'] = dBDATA!.map((v) => v.toJson()).toList();
-    }
+  // Map<String, dynamic> toJson() {
+  //   final Map<String, dynamic> data = <String, dynamic>{};
+  //   data['STATUS'] = sTATUS;
+  //   if (dBDATA != null) {
+  //     data['DB_DATA'] = dBDATA!.map((v) => v.toJson()).toList();
+  //   }
 
-    return data;
-  }
+  //   return data;
+  // }
 }
 
 class DBDATA {
-  String? id;
-  String? orgId;
+  int? id;
+  int? orgId;
   String? userName;
   String? orgAdmin;
   String? userEmail;
   String? userPassword;
-  String? userRole;
+  int? userRole;
   String? status;
-  String? entryTime;
+  int? entryTime;
   String? roleName;
   String? orgName;
   String? entryTimeFormated;
@@ -77,41 +77,20 @@ class DBDATA {
     roleName = json['role_name'];
     orgName = json['org_name'];
     entryTimeFormated = json['entry_time_formated'];
-    permissions = json['permissions'] != null && json['permissions'] != ''
+   permissions = json['permissions'] != null && json['permissions'] != ''
         ? Permissions.fromJson(json['permissions'])
         : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['org_id'] = orgId;
-    data['user_name'] = userName;
-    data['org_admin'] = orgAdmin;
-    data['user_email'] = userEmail;
-    data['user_password'] = userPassword;
-    data['user_role'] = userRole;
-    data['status'] = status;
-    data['entry_time'] = entryTime;
-    data['role_name'] = roleName;
-    data['org_name'] = orgName;
-    data['entry_time_formated'] = entryTimeFormated;
-    if (permissions != null) {
-      data['permissions'] = permissions!.toJson();
-    }
-    return data;
-  }
-}
+  }}
 
 class Permissions {
-  String? id;
-  String? userId;
+  int? id;
+  int? userId;
   String? fullAccess;
   String? insertAccess;
   String? updateAccess;
   String? deleteAccess;
   String? status;
-  String? entryTime;
+  int? entryTime;
 
   Permissions(
       {this.id,
@@ -132,18 +111,5 @@ class Permissions {
     deleteAccess = json['delete_access'];
     status = json['status'];
     entryTime = json['entry_time'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['user_id'] = userId;
-    data['full_access'] = fullAccess;
-    data['insert_access'] = insertAccess;
-    data['update_access'] = updateAccess;
-    data['delete_access'] = deleteAccess;
-    data['status'] = status;
-    data['entry_time'] = entryTime;
-    return data;
   }
 }

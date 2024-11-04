@@ -14,7 +14,7 @@ static String imgdeshboard = '$imagePath/DeshboardHexagon.png';
   static String imgHide = '$imagePath/img_hide.png';
 
   // Login Screen images
-  static String imgFyreboxLogo = '$imagePath/img_fyrebox_logo.png';
+  static String imgFyreboxLogo = '$imagePath/img_fyrebox_logo1.png';
   static String imgHide20x20 = '$imagePath/img_hide_20x20.png';
 
   // Dashboard Screen images

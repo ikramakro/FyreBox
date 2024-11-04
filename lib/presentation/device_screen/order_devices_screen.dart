@@ -42,7 +42,7 @@ class OrderDeviceScreenState extends State<OrderDeviceScreen> {
                   items:
                       provider.deviceModelObj.orderdeviceTypeDropdownItemList,
                   onChanged: (value) {
-                    provider.setOrderDeviceType(value.title);
+                    provider.setOrderDeviceType(value.id.toString());
                   },
                 ),
                 const SizedBox(height: 16.0),
@@ -72,7 +72,7 @@ class OrderDeviceScreenState extends State<OrderDeviceScreen> {
                       backgroundColor:
                           WidgetStateProperty.all(appTheme.deepOrangeA100)),
                   onPressed: () {
-                    // provider.orderDevice();
+                    provider.orderDevice();
                   },
                   text: 'Order Device',
                   height: 50,

@@ -6,22 +6,19 @@ import '../../widgets/custom_text_form_field.dart';
 import 'provider/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const LoginScreen({super.key});
   @override
   LoginScreenState createState() => LoginScreenState();
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => LoginProvider(),
-      child: LoginScreen(),
+      child: const LoginScreen(),
     );
   }
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -102,7 +99,7 @@ class LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 4.h),
                       child: Text(
-                        "lbl_username".tr,
+                        "Email          ".tr,
                         style: CustomTextStyles.titleMediumBlack900_1,
                       ),
                     ),
@@ -115,7 +112,7 @@ class LoginScreenState extends State<LoginScreen> {
                           return CustomTextFormField(
                             width: 236.h,
                             controller: userNameController,
-                            hintText: "msg_enter_user_name".tr,
+                            hintText: "Email Address ".tr,
                             alignment: Alignment.center,
                             contentPadding:
                                 EdgeInsets.fromLTRB(10.h, 2.h, 10.h, 8.h),

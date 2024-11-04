@@ -23,32 +23,31 @@ class DeshboardProvider extends ChangeNotifier {
     await loadDashboardData();
     loadInitialData();
   }
-Future<void> loadInitialData() async {
+
+  Future<void> loadInitialData() async {
     await orderDevice();
   }
 
   FutureOr<void> orderDevice() async {
     USERDATA userdata = prefUtils.getUserData()!;
     await _repository.orgData(
-      formData: {
-       'org_id': userdata.orgId
-      },
+      formData: {'org_id': userdata.orgId},
     );
     // Notify listeners if there's any data that needs to update UI
     notifyListeners();
   }
+
   FutureOr<void> loadDashboardData({
     Function? onSuccess,
     Function? onError,
   }) async {
-    
     // sp.saveToDisk('orgid', postLoginDeviceAuthResp.uSERDATA?.orgId ?? '');
     USERDATA userdata = prefUtils.getUserData()!;
 
     await _repository.dashboardData(
       formData: {
         'operation': 'get_dashboard_data',
-        'access_token': 'developer_bypass',
+        // 'access_token': 'developer_bypass',
         'org_id': userdata.orgId
       },
     ).then((value) async {
@@ -61,10 +60,5 @@ Future<void> loadInitialData() async {
         // notifyListeners();
       }
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

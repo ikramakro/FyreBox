@@ -45,25 +45,14 @@ class _AddOrganizationUserScreenState extends State<AddOrganizationUserScreen> {
                     style: TextStyle(fontSize: 16.0)),
                 Row(
                   children: [
-                    CustomRadioButton(
-                      value: 'Yes',
-                      groupValue: provider.isOrganizationOwner ? 'Yes' : 'No',
-                      onChange: (value) {
-                        provider.setOrganizationOwner(value == 'Yes');
+                    Checkbox(
+                      value: provider.isOrganizationOwner,
+                      onChanged: (bool? newValue) {
+                        provider.setOrganizationOwner(newValue ?? false);
                       },
-                      text: 'Yes',
-                      backgroundColor: appTheme.deepOrangeA100,
                     ),
-                    const SizedBox(width: 16),
-                    CustomRadioButton(
-                      value: 'No',
-                      groupValue: provider.isOrganizationOwner ? 'Yes' : 'No',
-                      onChange: (value) {
-                        provider.setOrganizationOwner(value == 'Yes');
-                      },
-                      text: 'No',
-                      backgroundColor: appTheme.deepOrangeA100,
-                    ),
+                    const SizedBox(width: 8),
+                    const Text('Is Organization Owner'),
                   ],
                 ),
                 CustomTextFormField1(

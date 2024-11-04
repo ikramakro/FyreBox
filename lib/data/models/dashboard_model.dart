@@ -33,10 +33,10 @@ class DashboardModel {
 }
 
 class DBDATA {
-  String? totalMyDevices;
-  String? totalMyAlerts;
-  String? totalMyVisitors;
-  String? totalMyDueInvoices;
+  dynamic totalMyDevices;
+  dynamic totalMyAlerts;
+  dynamic totalMyVisitors;
+  dynamic totalMyDueInvoices;
 
   DBDATA(
       {this.totalMyDevices,
@@ -63,14 +63,14 @@ class DBDATA {
 
 class SESSION {
   String? accountType;
-  String? id;
-  String? orgId;
+  int? id;
+  int? orgId;
   String? userName;
   String? orgAdmin;
   String? userEmail;
-  String? userRole;
+  int? userRole;
   String? status;
-  String? entryTime;
+  dynamic entryTime;
   String? roleName;
   String? orgName;
   String? orgStatus;

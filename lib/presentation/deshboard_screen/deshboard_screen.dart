@@ -1,3 +1,5 @@
+import 'package:fyrebox/core/utils/navigator_service.dart';
+
 import '../../core/app_export.dart';
 import '../../core/utils/constant.dart';
 import 'provider/deshboard_provider.dart';
@@ -102,10 +104,10 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
               }
 
               List count = [
-                provider.model.dBDATA?.totalMyAlerts ?? '',
-                provider.model.dBDATA?.totalMyDevices ?? '',
-                provider.model.dBDATA?.totalMyDueInvoices ?? '',
-                provider.model.dBDATA?.totalMyVisitors ?? ''
+                provider.model.dBDATA?.totalMyAlerts.toString() ?? '',
+                provider.model.dBDATA?.totalMyDevices.toString() ?? '',
+                provider.model.dBDATA?.totalMyDueInvoices.toString() ?? '',
+                provider.model.dBDATA?.totalMyVisitors.toString() ?? ''
               ];
               List name = [
                 'Total Alerts',
@@ -132,9 +134,15 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 appTheme.green500,
                 appTheme.deepPurpleA100
               ];
+              List navigator = [
+                3,
+                2,
+                1,
+                4,
+              ];
               return GridView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 20.h,
@@ -143,12 +151,17 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 ),
                 itemCount: 4,
                 itemBuilder: (context, index) {
-                  return ChipviewoneItemWidget(
-                    text: name[index],
-                    chipviewoneItem: count[index],
-                    icon: icon[index],
-                    backgroundColor: bgColor[index],
-                    color: color[index],
+                  return GestureDetector(
+                    onTap: () => NavigatorService.pushNamed(
+                        AppRoutes.rootScreen,
+                        arguments: navigator[index]),
+                    child: ChipviewoneItemWidget(
+                      text: name[index],
+                      chipviewoneItem: count[index],
+                      icon: icon[index],
+                      backgroundColor: bgColor[index],
+                      color: color[index],
+                    ),
                   );
                 },
               );
@@ -276,7 +289,8 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   // }
 
   Widget _buildEvacuationMapSection(BuildContext context) {
-    print('232323232323232333039458034584059850843098509999999999==============================${dbData?.orgEvacuationMap}');
+    print(
+        '232323232323232333039458034584059850843098509999999999==============================${dbData?.orgEvacuationMap}');
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(right: 4.h),
@@ -301,14 +315,14 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
             ),
           ),
           SizedBox(height: 6.h),
-            Consumer<DeshboardProvider>(
-            builder: (context, provider, child) {
-              return
-          CustomImageView(
-            imagePath: 'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap??''}',
-            height: 268.h,
-            width: double.maxFinite,
-          );})
+          Consumer<DeshboardProvider>(builder: (context, provider, child) {
+            return CustomImageView(
+              imagePath:
+                  'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap ?? ''}',
+              height: 268.h,
+              width: double.maxFinite,
+            );
+          })
         ],
       ),
     );

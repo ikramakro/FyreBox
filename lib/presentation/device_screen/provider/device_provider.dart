@@ -1,4 +1,9 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:fyrebox/core/utils/progress_dialog_utils.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
@@ -15,7 +20,7 @@ class DeviceProvider extends ChangeNotifier {
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
-
+  String? selectedType;
   final TextEditingController quantityController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController deviceNameController = TextEditingController();
@@ -27,6 +32,9 @@ class DeviceProvider extends ChangeNotifier {
   final TextEditingController mfrEmailController = TextEditingController();
   final TextEditingController mfrDateController = TextEditingController();
   final TextEditingController serialNumberController = TextEditingController();
+  final TextEditingController deviceTypeController = TextEditingController();
+  final TextEditingController deviceLocationController1 =
+      TextEditingController();
 
   bool isOrganizationOwner = false;
   String? selectedUserRole;
@@ -47,8 +55,40 @@ class DeviceProvider extends ChangeNotifier {
     await loadDashboardData();
   }
 
+  void downloadFile() async {
+    // Create an instance of Dio
+    var token = PrefUtils().getAccessToken();
+    Dio dio = Dio();
+
+    // URL for file download
+    String url =
+        'https://fyreboxhub.com/api/export_device_checklists.php?access_token=$token';
+    print(
+        'https://fyreboxhub.com/api/export_device_checklists.php?access_token=$token');
+    // Get the directory to save the downloaded file
+    Directory directory = await getApplicationDocumentsDirectory();
+    String filePath = '${directory.path}/export_device_checklists.csv';
+
+    try {
+      // Download the file
+      ProgressDialogUtils.showProgressDialog();
+      await dio.download(url, filePath, onReceiveProgress: (received, total) {
+        if (total != -1) {
+          print("${(received / total * 100).toStringAsFixed(0)}%");
+        }
+      });
+      ProgressDialogUtils.hideProgressDialog();
+      print("Download completed! File saved at $filePath");
+      showSuccess("Download completed! File saved at $filePath");
+    } catch (e) {
+      print("Error: $e");
+      showError("Error: $e");
+    }
+  }
+
   void setDeviceType(String type) {
-    // Handle device type selection
+    selectedType = type;
+    notifyListeners();
   }
 
   void setMfrDate(String date) {
@@ -60,7 +100,7 @@ class DeviceProvider extends ChangeNotifier {
     USERDATA userdata = prefUtils.getUserData()!;
     await _repository.orderDevice(
       formData: {
-        'device_type': '1',
+        'device_type': selectedDeviceType,
         'device_quantity': quantityController.text,
         'device_description': descriptionController.text,
         'operation': 'order_device',
@@ -69,7 +109,7 @@ class DeviceProvider extends ChangeNotifier {
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
         showSuccess(value.dESCRIPTION ?? '');
-        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 1);
+        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 0);
         notifyListeners();
       } else {
         showError(value.eRRORDESCRIPTION ?? '');
@@ -83,7 +123,7 @@ class DeviceProvider extends ChangeNotifier {
       formData: {
         'org_id': userdata.orgId,
         'device_name': deviceNameController.text,
-        'device_type': deviceModelObj.deviceTypeDropdownItemList,
+        'device_type': "2",
         'device_cite_name': siteNameController.text,
         'device_location': deviceLocationController.text,
         'manufacturer_name': mfrNameController.text,
@@ -97,11 +137,59 @@ class DeviceProvider extends ChangeNotifier {
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
         showSuccess(value.dESCRIPTION ?? '');
-        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 1);
+        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 0);
         notifyListeners();
       } else {
         showError(value.eRRORDESCRIPTION ?? '');
       }
+    });
+  }
+
+  Future<void> deleteDevice(String deviceId) async {
+    await _repository.addDevice(
+      formData: {
+        'operation': 'delete_device',
+        'device_id': deviceId,
+        // 'access_token': 'developer_bypass',
+      },
+    ).then((value) {
+      if (value.sTATUS != "ERROR") {
+        // Remove the device from the list
+        model.dbData?.removeWhere((device) => device.id.toString() == deviceId);
+
+        // Notify the listeners to rebuild the UI
+        notifyListeners();
+
+        showSuccess('Device deleted successfully');
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Failed to delete device');
+      }
+    }).catchError((error) {
+      showError('An error occurred while deleting the device');
+    });
+  }
+
+  Future<void> updateDevice(String deviceId) async {
+    USERDATA userdata = prefUtils.getUserData()!;
+    await _repository.addDevice(
+      formData: {
+        'operation':
+            'update_device', // Assuming the backend operation is called 'update_device'
+        'device_id': deviceId,
+        'device_type': deviceTypeController.text,
+        'device_location': deviceLocationController.text,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess('Device updated successfully');
+        // Fetch updated device data
+        await loadDashboardData();
+        notifyListeners();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Failed to update device');
+      }
+    }).catchError((error) {
+      showError('An error occurred while updating the device');
     });
   }
 
@@ -206,7 +294,7 @@ class DeviceProvider extends ChangeNotifier {
 
   void onChanged(String value) async {
     // For filtered data
-    String org = await prefUtils.getOrgValue('orgid');
+    String org = prefUtils.getOrgValue('orgid');
 
     if (value == 'Active') {
       await _repository.deviceData(
@@ -260,9 +348,9 @@ class DeviceProvider extends ChangeNotifier {
   }
 
   void onSelectedChipView(int index, bool value) {
-    deviceModelObj.actionsItemList.forEach((element) {
+    for (var element in deviceModelObj.actionsItemList) {
       element.isSelected = false;
-    });
+    }
     deviceModelObj.actionsItemList[index].isSelected = value;
     notifyListeners();
   }

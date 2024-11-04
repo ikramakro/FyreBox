@@ -24,7 +24,7 @@ showSuccess(String text) {
     // context: context, // optional if you use ToastificationWrapper
     type: ToastificationType.success,
     style: ToastificationStyle.flatColored,
-    autoCloseDuration: const Duration(seconds: 1),
+    autoCloseDuration: const Duration(seconds: 3),
     title: const Text('Success'),
     // you can also use RichText widget for title and description parameters
     description: RichText(text: TextSpan(text: text)),
@@ -124,9 +124,10 @@ showError(String text) {
     // ),
   );
 }
+
 List<EvacuationMap>? evacuationMaps;
-  List<Helpline>? helplines;
-  DBData?  dbData;
+List<Helpline>? helplines;
+DBData? dbData;
 // String appId = 'f8580b0a2vtst';
 // String jwtToken = '';
 // String oneIDnigol = '';

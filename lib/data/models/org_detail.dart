@@ -11,18 +11,18 @@ class Organization {
 }
 
 class DBData {
-  String? id;
+  dynamic id;
   String? orgName;
   String? orgEmail;
   String? orgPhone;
-  String? type;
+  dynamic type;
   String? orgVat;
   String? orgLogo;
   String? orgEvacuationMap;
   String? address;
-  String? addedBy;
+  dynamic addedBy;
   String? status;
-  String? entryTime;
+  dynamic entryTime;
   String? orgTypeName;
   String? entryTimeFormated;
   List<EvacuationMap>? evacuationMaps;
@@ -77,7 +77,7 @@ class DBData {
 }
 
 class EvacuationMap {
-  String? id;
+  dynamic id;
   String? evacuationMap;
 
   EvacuationMap({this.id, this.evacuationMap});
@@ -89,7 +89,7 @@ class EvacuationMap {
 }
 
 class Helpline {
-  String? id;
+dynamic id;
   String? name;
   String? address;
   String? phone;

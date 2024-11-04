@@ -3,9 +3,7 @@ import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
 import '../../../data/models/alert_model.dart';
-import '../../../data/models/device_model.dart';
 import '../../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
-import '../../../data/models/user_data_model.dart';
 import '../../../data/repository/repository.dart';
 import '../models/alerts_model.dart';
 
@@ -16,13 +14,18 @@ class AlertsProvider extends ChangeNotifier {
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
-
+  String? selectedStatus;
   AlertsProvider() {
     init();
   }
 
   init() async {
     await loadAlertData();
+  }
+
+  void setSelectedStatus(String? status) {
+    selectedStatus = status;
+    notifyListeners();
   }
 
   FutureOr<void> loadAlertData({
@@ -38,6 +41,7 @@ class AlertsProvider extends ChangeNotifier {
         'user_id': userdata.orgId
       },
     ).then((value) async {
+      model = AlertResponse();
       model = value;
       if (model.sTATUS != "ERROR") {
         notifyListeners();
@@ -47,6 +51,48 @@ class AlertsProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> updateAlertStatus(
+    String alertId,
+  ) async {
+    // USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'update_alert',
+        'access_token': 'developer_bypass',
+        'alert_id': alertId,
+        'status': selectedStatus,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        await loadAlertData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error updating alert status.');
+      }
+    });
+  }
+
+  Future<void> deleteAlert(
+    String alertId,
+  ) async {
+    // USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'delete_alert',
+        'access_token': 'developer_bypass',
+        'alert_id': alertId,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        await loadAlertData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error Deleting alert status.');
+      }
+    });
+  }
   // void onChanged(String value) async {
   //   // For filtered data
   //   String org = await prefUtils.getOrgValue('orgid');

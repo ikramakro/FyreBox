@@ -45,6 +45,28 @@ class VisitorProvider extends ChangeNotifier {
     });
   }
 
+  FutureOr<void> deleteVisitorData({String? id}) async {
+    USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.deleteVisoterData(
+      formData: {'operation': 'delete_visitor', 'id': id},
+    ).then((value) async {
+      if (model.sTATUS != "ERROR") {
+        // Remove the visitor from the list
+        model.dBDATA?.removeWhere((visitor) => visitor.id.toString() == id);
+
+        // Notify listeners to rebuild the UI
+        notifyListeners();
+
+        showSuccess('Visitor deleted successfully');
+      } else {
+        showError(model.eRRORDESCRIPTION ?? 'Failed to delete visitor');
+      }
+    }).catchError((error) {
+      showError('An error occurred while deleting the visitor');
+    });
+  }
+
   void onChanged(String value) async {
     USERDATA userdata = prefUtils.getUserData()!;
 

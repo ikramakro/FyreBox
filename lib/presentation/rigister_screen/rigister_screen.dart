@@ -4,22 +4,19 @@ import '../../widgets/custom_text_form_field.dart';
 import 'provider/rigister_provider.dart';
 
 class RigisterScreen extends StatefulWidget {
-  const RigisterScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const RigisterScreen({super.key});
   @override
   RigisterScreenState createState() => RigisterScreenState();
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => RigisterProvider(),
-      child: RigisterScreen(),
+      child: const RigisterScreen(),
     );
   }
 }
 
 class RigisterScreenState extends State<RigisterScreen> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -140,7 +137,7 @@ class RigisterScreenState extends State<RigisterScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 4.h),
                       child: Text(
-                        "lbl_username".tr,
+                        "Email Address".tr,
                         style: CustomTextStyles.titleMediumBlack900_1,
                       ),
                     ),
@@ -327,7 +324,9 @@ class RigisterScreenState extends State<RigisterScreen> {
               ),
               SizedBox(height: 74.h),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  NavigatorService.goBack();
+                },
                 child: Text(
                   "Have an Account".tr,
                   style: CustomTextStyles.titleMediumBlack900,

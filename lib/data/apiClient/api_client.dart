@@ -7,19 +7,20 @@ import 'package:toastification/toastification.dart';
 import '../../core/app_export.dart';
 import '../../core/utils/constant.dart';
 import '../../core/utils/progress_dialog_utils.dart';
+import '../../core/utils/shared_prf.dart';
 
 class ApiClient {
   // final _config = locator<Config>();
   String getbaseurl = 'https://fyreboxhub.com/api/get_data';
   Future<Dio> launchDio() async {
-    // String? accessToken = LocalStorageService().accessToken;
+    String? accessToken = PrefUtils().getAccessToken();
     Dio dio = Dio();
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // dio.interceptors.add(
     //     DioCacheManager(CacheConfig(baseUrl: EndPoint.baseUrl)).interceptor);
     dio.options.headers['Content-Type'] = 'application/json';
     dio.options.headers['accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'Bearer $accessToken';
+    dio.options.headers['Authorization'] = 'Bearer $accessToken';
 
     dio.options.followRedirects = false;
     dio.options.validateStatus = (s) {
@@ -37,7 +38,7 @@ class ApiClient {
       required Map<String, dynamic>? formData}) async {
     var connected = await NetworkInfo().isConnected();
     ProgressDialogUtils.showProgressDialog();
-    final response;
+    final Response response;
     if (connected) {
       Dio dio = await launchDio();
       try {
@@ -73,18 +74,23 @@ class ApiClient {
     }
   }
 
-  post({required String baseUrl, required formdata,String? contantType}) async {
+  post(
+      {required String baseUrl, required formdata, String? contantType}) async {
     var connected = await NetworkInfo().isConnected();
 
     if (connected) {
       Dio dio = await launchDio();
       // print(' == $baseUrl $formdata');
-      final response = await dio.post(baseUrl, queryParameters: formdata, options: Options(
-              contentType: contantType ?? 'application/json',
-              followRedirects: false,
-              validateStatus: (status) {
-                return status! < 500;
-              }),);
+      final response = await dio.post(
+        baseUrl,
+        queryParameters: formdata,
+        options: Options(
+            contentType: contantType ?? 'application/json',
+            followRedirects: false,
+            validateStatus: (status) {
+              return status! < 500;
+            }),
+      );
 
       if (response.statusCode == 200) {
         return response;
@@ -129,6 +135,7 @@ class ApiClient {
                 return status! < 500;
               }),
         );
+        print('=-=-=-=-=-=- ${response.data}');
         ProgressDialogUtils.hideProgressDialog();
         return response;
       } on DioException catch (e) {
