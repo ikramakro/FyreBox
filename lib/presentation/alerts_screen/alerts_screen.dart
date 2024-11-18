@@ -3,9 +3,9 @@ import 'package:fyrebox/data/models/alert_model.dart';
 import 'package:fyrebox/presentation/alerts_screen/models/alerts_model.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../core/app_export.dart';
-import '../../widgets/custom_drop_down.dart';
-import '../../widgets/custom_radio_button.dart';
-import 'provider/alerts_provider.dart'; // Assuming you have this widget
+import '../../widgets/customCheckbox.dart';
+import '../../widgets/custom_drop_down.dart'; // Replace CustomRadioButton with CustomCheckbox
+import 'provider/alerts_provider.dart';
 
 import 'package:syncfusion_flutter_core/theme.dart';
 
@@ -31,7 +31,6 @@ class AlertScreenState extends State<AlertScreen> {
 
   void _showUpdateAlertPopup(
       BuildContext context, DBDATA alert, AlertsProvider provider) {
-    // final provider = Provider.of<AlertsProvider>(context, listen: false);
     provider.setSelectedStatus(alert.status);
 
     showDialog(
@@ -51,20 +50,18 @@ class AlertScreenState extends State<AlertScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomRadioButton(
-                        value: '1',
-                        groupValue: provider.selectedStatus,
+                      CustomCheckbox(
+                        value: provider.selectedStatus == '1',
                         text: 'Active',
-                        onChange: (value) {
-                          provider.setSelectedStatus(value);
+                        onChanged: (value) {
+                          provider.setSelectedStatus(value ? '1' : '0');
                         },
                       ),
-                      CustomRadioButton(
-                        value: '0',
-                        groupValue: provider.selectedStatus,
+                      CustomCheckbox(
+                        value: provider.selectedStatus == '0',
                         text: 'Inactive',
-                        onChange: (value) {
-                          provider.setSelectedStatus(value);
+                        onChanged: (value) {
+                          provider.setSelectedStatus(value ? '0' : '1');
                         },
                       ),
                     ],
@@ -111,8 +108,6 @@ class AlertScreenState extends State<AlertScreen> {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                // final provider =
-                //     Provider.of<AlertsProvider>(context, listen: false);
                 provider.deleteAlert(alert.id.toString());
                 Navigator.of(context).pop();
               },
@@ -149,13 +144,6 @@ class AlertScreenState extends State<AlertScreen> {
       create: (context) => AlertsProvider(),
       child: SafeArea(
         child: Scaffold(
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {
-          //     // NavigatorService.pushNamed(AppRoutes.addAlertScreen);
-          //   },
-          //   backgroundColor: Colors.red,
-          //   child: const Icon(Icons.add),
-          // ),
           extendBody: true,
           extendBodyBehindAppBar: true,
           body: Consumer<AlertsProvider>(
@@ -244,7 +232,7 @@ class AlertScreenState extends State<AlertScreen> {
                                 ),
                                 GridColumn(
                                     columnName: 'color',
-                                    width: 50, // Reduced width of color column
+                                    width: 50,
                                     label: const Center(child: Text('Color'))),
                                 GridColumn(
                                     columnName: 'alert',
@@ -260,7 +248,7 @@ class AlertScreenState extends State<AlertScreen> {
                                     columnName: 'description',
                                     label: const Center(
                                         child: Text('Description')),
-                                    width: 200), // Added width constraint
+                                    width: 200),
                                 GridColumn(
                                     columnName: 'status',
                                     label: const Center(child: Text('Status'))),
@@ -315,7 +303,7 @@ class AlertDataSource extends DataGridSource {
               DataGridCell<String>(
                 columnName: 'description',
                 value: alert.alertDescription,
-              ), // Set lineSpan to 3
+              ),
               DataGridCell<Widget>(
                   columnName: 'status',
                   value: Card(
@@ -373,7 +361,7 @@ class AlertDataSource extends DataGridSource {
       Center(
         child: Text(
           row.getCells()[5].value.toString(),
-          maxLines: 3, // Allow description to span up to 3 lines
+          maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
       ),

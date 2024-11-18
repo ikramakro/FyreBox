@@ -5,10 +5,12 @@ import '../../../widgets/custom_text_form_field1.dart';
 import 'change_password_provider.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
+  const ChangePasswordScreen({super.key});
+
   Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => ChangePasswordProvider(),
-      child: ChangePasswordScreen(),
+      child: const ChangePasswordScreen(),
     );
   }
 
@@ -35,7 +37,13 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextFormField1(
                   controller: provider.oldPasswordController,
                   hintText: 'Enter your old password',
-                  obscureText: true,
+                  obscureText: !provider.isOldPasswordVisible,
+                  suffix: IconButton(
+                    icon: Icon(provider.isOldPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: provider.toggleOldPasswordVisibility,
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 const Text(
@@ -46,7 +54,13 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextFormField1(
                   controller: provider.newPasswordController,
                   hintText: 'Enter your new password',
-                  obscureText: true,
+                  obscureText: !provider.isNewPasswordVisible,
+                  suffix: IconButton(
+                    icon: Icon(provider.isNewPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: provider.toggleNewPasswordVisibility,
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 const Text(
@@ -57,7 +71,13 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextFormField1(
                   controller: provider.retypePasswordController,
                   hintText: 'Re-type your new password',
-                  obscureText: true,
+                  obscureText: !provider.isRetypePasswordVisible,
+                  suffix: IconButton(
+                    icon: Icon(provider.isRetypePasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: provider.toggleRetypePasswordVisibility,
+                  ),
                 ),
                 const SizedBox(height: 24.0),
                 Center(

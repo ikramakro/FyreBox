@@ -12,13 +12,30 @@ class ChangePasswordProvider extends ChangeNotifier {
   final _repository = Repository();
   PrefUtils prefUtils = PrefUtils();
   USERDATA? userdata;
-
+  bool isOldPasswordVisible = false;
+  bool isNewPasswordVisible = false;
+  bool isRetypePasswordVisible = false;
   ChangePasswordProvider() {
     init();
   }
 
   void init() async {
-    userdata = await prefUtils.getUserData();
+    userdata = prefUtils.getUserData();
+  }
+
+  void toggleOldPasswordVisibility() {
+    isOldPasswordVisible = !isOldPasswordVisible;
+    notifyListeners();
+  }
+
+  void toggleNewPasswordVisibility() {
+    isNewPasswordVisible = !isNewPasswordVisible;
+    notifyListeners();
+  }
+
+  void toggleRetypePasswordVisibility() {
+    isRetypePasswordVisible = !isRetypePasswordVisible;
+    notifyListeners();
   }
 
   Future<void> changePassword() async {
@@ -26,29 +43,35 @@ class ChangePasswordProvider extends ChangeNotifier {
       showError('New password and re-type password do not match');
       return;
     }
-
-    try {
-      final response = await _repository.updateUserPassword(
-        formData: {
-          'old_password': oldPasswordController.text,
-          'user_id': userdata?.id ?? '',
-          'new_password': newPasswordController.text,
-          're_password': retypePasswordController.text,
-          'operation': 'update_user_password',
-          'access_token': 'developer_bypass',
-        },
-      );
-
-      if (response.sTATUS != "ERROR") {
-        // Handle success
-        showSuccess('Password changed successfully');
-        notifyListeners();
-      } else {
-        // Handle error
-        showError(response.eRRORDESCRIPTION ?? 'Failed to change password');
+    Future<void> changePassword() async {
+      if (newPasswordController.text != retypePasswordController.text) {
+        showError('New password and re-type password do not match');
+        return;
       }
-    } catch (error) {
-      showError('An error occurred while changing the password');
+
+      try {
+        final response = await _repository.updateUserPassword(
+          formData: {
+            'old_password': oldPasswordController.text,
+            'user_id': userdata?.id ?? '',
+            'new_password': newPasswordController.text,
+            're_password': retypePasswordController.text,
+            'operation': 'update_user_password',
+            'access_token': 'developer_bypass',
+          },
+        );
+
+        if (response.sTATUS != "ERROR") {
+          // Handle success
+          showSuccess('Password changed successfully');
+          notifyListeners();
+        } else {
+          // Handle error
+          showError(response.eRRORDESCRIPTION ?? 'Failed to change password');
+        }
+      } catch (error) {
+        showError('An error occurred while changing the password');
+      }
     }
   }
 }

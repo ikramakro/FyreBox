@@ -42,16 +42,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showDeleteConfirmationDialog(context);
             },
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.contact_mail),
-            title: const Text('Contact Info'),
-            onTap: () {
-              // Handle tap for Contact Info
-              NavigatorService.pushNamed(AppRoutes.contactInfoScreen);
-              // _showContactInfoDialog(context);
-            },
-          ),
+          // const Divider(),
+          // ListTile(
+          //   leading: const Icon(Icons.contact_mail),
+          //   title: const Text('Contact Info'),
+          //   onTap: () {
+          //     // Handle tap for Contact Info
+          //     NavigatorService.pushNamed(AppRoutes.contactInfoScreen);
+          //     // _showContactInfoDialog(context);
+          //   },
+          // ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.image),

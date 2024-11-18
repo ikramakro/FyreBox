@@ -51,7 +51,7 @@ class VisitorProvider extends ChangeNotifier {
     await _repository.deleteVisoterData(
       formData: {'operation': 'delete_visitor', 'id': id},
     ).then((value) async {
-      if (model.sTATUS != "ERROR") {
+      if (value.sTATUS != "ERROR") {
         // Remove the visitor from the list
         model.dBDATA?.removeWhere((visitor) => visitor.id.toString() == id);
 
@@ -60,7 +60,33 @@ class VisitorProvider extends ChangeNotifier {
 
         showSuccess('Visitor deleted successfully');
       } else {
-        showError(model.eRRORDESCRIPTION ?? 'Failed to delete visitor');
+        showError(value.eRRORDESCRIPTION ?? 'Failed to delete visitor');
+      }
+    }).catchError((error) {
+      showError('An error occurred while deleting the visitor');
+    });
+  }
+
+  FutureOr<void> updateVisitorData(
+      {String? id, String? visitor_name, String? visitor_status}) async {
+    USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.deleteVisoterData(
+      formData: {
+        'operation': 'update_visitor',
+        'visitor_id': id,
+        'visitor_name': visitor_name,
+        'visitor_status': visitor_status
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        // Remove the visitor from the list
+
+        notifyListeners();
+
+        showSuccess('Visitor Updated successfully');
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Failed to Updated visitor');
       }
     }).catchError((error) {
       showError('An error occurred while deleting the visitor');

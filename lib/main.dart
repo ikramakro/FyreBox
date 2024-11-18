@@ -13,6 +13,7 @@ void main() {
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
     PrefUtils().init()
+    // ?????
   ]).then((value) {
     runApp(const MyApp());
   });

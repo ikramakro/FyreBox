@@ -4,12 +4,14 @@ import '../../widgets/custom_text_form_field1.dart';
 import 'provider/emergency_provider.dart';
 
 class AddHelplineScreen extends StatefulWidget {
+  const AddHelplineScreen({super.key});
+
   @override
   _AddHelplineScreenState createState() => _AddHelplineScreenState();
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => EmergencyProvider(),
-      child: AddHelplineScreen(),
+      child: const AddHelplineScreen(),
     );
   }
 }
@@ -61,29 +63,34 @@ class _AddHelplineScreenState extends State<AddHelplineScreen> {
               SizedBox(
                 height: 20.v,
               ),
-              Row(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Organization Status:'),
-                  Radio(
-                    value: true,
-                    groupValue: _isActive,
-                    onChanged: (value) {
-                      setState(() {
-                        _isActive = value!;
-                      });
-                    },
-                  ),
-                  const Text('Active'),
-                  Radio(
-                    value: false,
-                    groupValue: _isActive,
-                    onChanged: (value) {
-                      setState(() {
-                        _isActive = value!;
-                      });
-                    },
-                  ),
-                  const Text('Inactive'),
+                  Row(
+                    children: [
+                      const Text('Organization Status:'),
+                      Checkbox(
+                        value: _isActive,
+                        onChanged: (value) {
+                          setState(() {
+                            _isActive = value!;
+                          });
+                        },
+                      ),
+                      const Text('Active'),
+                      Checkbox(
+                        value: !_isActive,
+                        onChanged: (value) {
+                          setState(() {
+                            _isActive = !value!;
+                          });
+                        },
+                      ),
+                      const Text('Inactive'),
+                    ],
+                  )
                 ],
               ),
               const SizedBox(height: 20),

@@ -30,42 +30,52 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Update Helpline Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16.0),
-              const Text('Helpline Name:', style: TextStyle(fontSize: 12.0)),
-              CustomTextFormField1(
-                hintText: helpline.name,
-              ),
-              const SizedBox(height: 16.0),
-              const Text('Helpline Status:', style: TextStyle(fontSize: 12.0)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Radio(
-                    value: '1',
-                    groupValue: helpline.status,
-                    onChanged: (value) {
-                      setState(() {
-                        helpline.status = value;
-                      });
-                    },
-                  ),
-                  const Text('Active'),
-                  Radio(
-                    value: '0',
-                    groupValue: helpline.status,
-                    onChanged: (value) {
-                      setState(() {
-                        helpline.status = value;
-                      });
-                    },
-                  ),
-                  const Text('Inactive'),
-                ],
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10.0),
+                const Text('Helpline Name:', style: TextStyle(fontSize: 12.0)),
+                CustomTextFormField1(
+                  hintText: helpline.name,
+                ),
+                const SizedBox(height: 10.0),
+                const Text('Helpline Status:',
+                    style: TextStyle(fontSize: 12.0)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Checkbox(
+                      value: helpline.status == '1',
+                      onChanged: (value) {
+                        setState(() {
+                          if (value == true) {
+                            helpline.status = '1'; // Set to Active
+                          } else {
+                            helpline.status =
+                                '0'; // Uncheck, so set to Inactive
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Active'),
+                    Checkbox(
+                      value: helpline.status == '0',
+                      onChanged: (value) {
+                        setState(() {
+                          if (value == true) {
+                            helpline.status = '0'; // Set to Inactive
+                          } else {
+                            helpline.status = '1'; // Uncheck, so set to Active
+                          }
+                        });
+                      },
+                    ),
+                    const Text('Inactive'),
+                  ],
+                )
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -78,8 +88,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
               child: const Text('Update'),
               onPressed: () {
                 // Call the provider update method
-                final provider =
-                    Provider.of<EmergencyProvider>(context, listen: false);
+                // final provider =
+                //     Provider.of<EmergencyProvider>(context, listen: false);
                 // provider.updateHelpline(helpline); // Update the helpline
                 Navigator.of(context).pop();
               },

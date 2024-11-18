@@ -134,8 +134,9 @@ class RootScreenState extends State<RootScreen> {
                 PopupMenuItem<int>(
                   value: 0,
                   child: ListTile(
-                    leading: Image.network(
-                      'https://fyreboxhub.com/assets/images/${dbData?.orgLogo ?? ''}',
+                    leading: CustomImageView(
+                      imagePath:
+                          'https://fyreboxhub.com/assets/images/${dbData?.orgLogo ?? ''}',
                       width: 40,
                       height: 40,
                       fit: BoxFit.contain,

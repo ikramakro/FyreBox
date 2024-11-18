@@ -4,6 +4,8 @@ import 'package:fyrebox/core/utils/pref_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 
+import '../../../core/utils/constant.dart';
+
 class OrganizationProvider extends ChangeNotifier {
   File? _logo;
   File? _map;
@@ -47,7 +49,7 @@ class OrganizationProvider extends ChangeNotifier {
 
     try {
       FormData formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
+        'org_logo': await MultipartFile.fromFile(
           _logo!.path,
         ),
       });
@@ -56,6 +58,11 @@ class OrganizationProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         print('Logo uploaded successfully');
+        if (response.data['STATUS'] == 'ERROR') {
+          showError(response.data['ERROR_DESCRIPTION']);
+        } else {
+          showSuccess('Successfully uploaded');
+        }
         print(response.data);
       } else {
         print('Failed to upload logo');
@@ -71,22 +78,29 @@ class OrganizationProvider extends ChangeNotifier {
   // Upload organization map
   Future<void> uploadMap() async {
     if (_map == null) return;
-
+    String? accessToken = PrefUtils().getAccessToken();
     _isUploadingMap = true;
     notifyListeners(); // Notify listeners to show loading indicator
 
-    const url = 'https://your-api-endpoint.com/upload-map';
+    final url =
+        'https://fyreboxhub.com/api/set_data.php?operation=update_organization_logo&access_token=$accessToken';
 
     try {
       FormData formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(_map!.path,
-            filename: _map!.path.split('/').last),
+        'org_map': await MultipartFile.fromFile(
+          _map!.path,
+        ),
       });
 
       Response response = await dio.post(url, data: formData);
 
       if (response.statusCode == 200) {
         print('Map uploaded successfully');
+        if (response.data['STATUS'] == 'ERROR') {
+          showError(response.data['ERROR_DESCRIPTION']);
+        } else {
+          showSuccess('Successfully uploaded');
+        }
       } else {
         print('Failed to upload map');
       }

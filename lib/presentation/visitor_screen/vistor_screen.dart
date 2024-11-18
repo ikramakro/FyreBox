@@ -28,63 +28,73 @@ class VistorScreenState extends State<VistorScreen> {
     super.initState();
   }
 
-  void _showUpdateVisitorPopup(BuildContext context, DBDATA visitor) {
+  void _showUpdateVisitorPopup(
+      BuildContext context, DBDATA visitor, VisitorProvider provider) {
+    TextEditingController namecontr =
+        TextEditingController(text: visitor.visitorName);
+    String visitorStatus = visitor.status!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Update Visitor Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16.0),
-              const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
-              CustomTextFormField1(
-                hintText: visitor.visitorName,
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Update Visitor Details'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16.0),
+                const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
+                CustomTextFormField1(
+                  controller: namecontr,
+                  hintText: visitor.visitorName,
+                ),
+                const SizedBox(height: 16.0),
+                const Text('Visitor Status:', style: TextStyle(fontSize: 12.0)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Checkbox(
+                      value: visitorStatus == '1',
+                      onChanged: (value) {
+                        setState(() {
+                          visitorStatus = '1';
+                        });
+                      },
+                    ),
+                    const Text('Active'),
+                    Checkbox(
+                      value: visitorStatus == '2',
+                      onChanged: (value) {
+                        setState(() {
+                          visitorStatus = '2';
+                        });
+                      },
+                    ),
+                    const Text('Inactive'),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              const SizedBox(height: 16.0),
-              const Text('Visitor Status:', style: TextStyle(fontSize: 12.0)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Radio(
-                    value: '1',
-                    groupValue: visitor.status,
-                    onChanged: (value) {
-                      setState(() {
-                        visitor.status = value;
-                      });
-                    },
-                  ),
-                  const Text('Active'),
-                  Radio(
-                    value: '0',
-                    groupValue: visitor.status,
-                    onChanged: (value) {
-                      setState(() {
-                        visitor.status = value;
-                      });
-                    },
-                  ),
-                  const Text('Inactive'),
-                ],
+              TextButton(
+                child: const Text('Update'),
+                onPressed: () {
+                  provider.updateVisitorData(
+                    id: visitor.id.toString(),
+                    visitor_name: namecontr.text,
+                    visitor_status: visitorStatus,
+                  );
+                  Navigator.of(context).pop();
+                },
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Update'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
@@ -220,8 +230,8 @@ class VistorScreenState extends State<VistorScreen> {
                             child: SfDataGrid(
                               source: VisitorDataSource(
                                 visitors: provider.model.dBDATA ?? [],
-                                onUpdate: (visitor) =>
-                                    _showUpdateVisitorPopup(context, visitor),
+                                onUpdate: (visitor) => _showUpdateVisitorPopup(
+                                    context, visitor, provider),
                                 onDelete: (visitor) =>
                                     _showDeleteConfirmationDialog(
                                         context, visitor, provider),

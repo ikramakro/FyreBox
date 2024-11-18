@@ -2,7 +2,6 @@ import 'dart:async';
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
-import '../../../data/models/alert_model.dart';
 import '../../../data/models/emergency_model.dart';
 import '../../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
 import '../../../data/repository/repository.dart';
@@ -84,7 +83,8 @@ class EmergencyProvider extends ChangeNotifier {
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
         showSuccess(value.dESCRIPTION ?? 'Helpline added successfully.');
-        await loadEmergencyData();
+        NavigatorService.pushNamedAndRemoveUntil(AppRoutes.rootScreen,
+            arguments: 5);
       } else {
         showError(value.eRRORDESCRIPTION ?? 'Error adding helpline.');
       }
@@ -112,27 +112,27 @@ class EmergencyProvider extends ChangeNotifier {
       }
     });
   }
-  // Future<void> updateAlert(DBData alert) async {
-  //   await _repository.updateAlert(
-  //     formData: {
-  //       'operation': 'update_alert',
-  //       'access_token': 'developer_bypass',
-  //       'alert_id': alert.id,
-  //       'device_id': alert.deviceId,
-  //       'alert_type': alert.alertType,
-  //       'status': alert.status,
-  //       'alert_name': alert.alertName,
-  //       'alert_color': alert.alertColor,
-  //       'alert_description': alert.alertDescription,
-  //       'entry_time': alert.entryTime,
-  //     },
-  //   ).then((value) async {
-  //     if (value.sTATUS != "ERROR") {
-  //       showSuccess(value.dESCRIPTION ?? '');
-  //       await loadAlertData();
-  //     } else {
-  //       showError(value.eRRORDESCRIPTION ?? '');
-  //     }
-  //   });
-  // }
+
+  Future<void> updateHelpline(DBDATA alert) async {
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'update_alert',
+        'access_token': 'developer_bypass',
+        'alert_id': alert.id,
+        // 'device_id': alert.deviceId,
+        // 'alert_type': alert.alertType,
+        // 'status': alert.status,
+        // 'alert_name': alert.alertName,
+        // 'alert_color': alert.alertColor,
+        // 'alert_description': alert.alertDescription,
+        // 'entry_time': alert.entryTime,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+      } else {
+        showError(value.eRRORDESCRIPTION ?? '');
+      }
+    });
+  }
 }

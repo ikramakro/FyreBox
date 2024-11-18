@@ -20,11 +20,15 @@ class DeviceModel {
   List<SelectionPopupModel> deviceTypeDropdownItemList = [
     SelectionPopupModel(
       id: 2,
-      title: "Admin",
+      title: "IntegrationUnit",
+    ),
+    SelectionPopupModel(
+      id: 2,
+      title: "AdminUnit",
     ),
     SelectionPopupModel(
       id: 1,
-      title: "Agent",
+      title: "FyrboxUnit",
       isSelected: true,
     ),
   ];
