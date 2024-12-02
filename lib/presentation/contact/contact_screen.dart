@@ -15,7 +15,7 @@ class ContactFyreBoxScreen extends StatelessWidget {
       create: (context) => ContactFyreBoxProvider(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Contact FyreBox'),
+          title: const Text('Contact Fyrebox'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),

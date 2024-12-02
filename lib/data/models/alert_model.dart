@@ -20,8 +20,6 @@ class AlertResponse {
       dBDATA = null;
     }
   }
-
- 
 }
 
 class DBDATA {
@@ -36,6 +34,8 @@ class DBDATA {
   String? orgName;
   String? deviceKey;
   String? entryTimeFormated;
+  String? devicelocation;
+  String? devicetypename;
 
   DBDATA(
       {this.id,
@@ -48,6 +48,8 @@ class DBDATA {
       this.alertDescription,
       this.orgName,
       this.deviceKey,
+      this.devicelocation,
+      this.devicetypename,
       this.entryTimeFormated});
 
   DBDATA.fromJson(Map<String, dynamic> json) {
@@ -61,6 +63,8 @@ class DBDATA {
     alertDescription = json['alert_description'];
     orgName = json['org_name'];
     deviceKey = json['device_key'];
+    devicelocation = json['device_location'];
+    devicetypename = json['device_location'];
     entryTimeFormated = json['entry_time_formated'];
   }
 }

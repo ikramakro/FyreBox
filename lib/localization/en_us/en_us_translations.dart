@@ -43,7 +43,7 @@ final Map<String, String> enUs = {
 
   // Common String
   "lbl_create_account": "Create Account",
-  "lbl_fyrebox": "FyreBox",
+  "lbl_fyrebox": "Fyrebox",
   "lbl_login": "Login",
   "lbl_password": "Password:",
   "lbl_username": "Username:",

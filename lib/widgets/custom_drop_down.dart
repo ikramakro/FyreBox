@@ -3,8 +3,8 @@ import '../core/app_export.dart';
 import '../data/models/selectionPopupModel/selection_popup_model.dart';
 
 class CustomDropDown extends StatelessWidget {
-  CustomDropDown(
-      {Key? key,
+  const CustomDropDown(
+      {super.key,
       this.alignment,
       this.width,
       this.boxDecoration,
@@ -24,10 +24,7 @@ class CustomDropDown extends StatelessWidget {
       this.fillColor,
       this.filled = false,
       this.validator,
-      this.onChanged})
-      : super(
-          key: key,
-        );
+      this.onChanged});
   final Alignment? alignment;
   final double? width;
   final BoxDecoration? boxDecoration;
@@ -70,10 +67,14 @@ class CustomDropDown extends StatelessWidget {
           items: items?.map((SelectionPopupModel item) {
             return DropdownMenuItem<SelectionPopupModel>(
               value: item,
-              child: Text(
-                item.title,
-                overflow: TextOverflow.ellipsis,
-                style: hintStyle ?? CustomTextStyles.bodyLargeBlack900,
+              child: FittedBox(
+                fit: BoxFit.fill, // Ensures the text scales down to fit
+                child: Text(
+                  item.title,
+                  overflow: TextOverflow.ellipsis, // Adds "..." for truncation
+                  style: hintStyle ?? CustomTextStyles.bodyLargeBlack900,
+                  maxLines: 1, // Ensures a single line
+                ),
               ),
             );
           }).toList(),

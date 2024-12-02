@@ -1,13 +1,13 @@
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
 import '../../core/app_export.dart';
 import '../../data/models/device_model.dart';
 import '../../widgets/custom_drop_down.dart';
 import 'models/device_model.dart';
-import 'package:intl/intl.dart';
-
 import 'provider/device_provider.dart';
 
 class DeviceScreen extends StatefulWidget {
@@ -61,57 +61,167 @@ class DeviceScreenState extends State<DeviceScreen> {
 
   void _showUpdateDeviceDialog(
       BuildContext context, DBData device, DeviceProvider provider) {
-    // Pre-fill the controllers with the current device values
     provider.deviceTypeController.text = device.deviceTypeName ?? '';
     provider.deviceLocationController.text = device.deviceLocation ?? '';
+    provider.deviceNameController.text = device.deviceName ?? '';
+    provider.deviceSiteController.text = device.deviceCiteName ?? '';
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Update Device'),
-          content: SingleChildScrollView(
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 16.0,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                // Dropdown for device type
+                Text('Update Device',
+                    style: Theme.of(context).textTheme.headlineLarge),
+                const SizedBox(height: 16.0),
                 CustomDropDown(
-                  hintText: '-- Select Device Type --',
+                  hintText: '-Select Device Type-',
                   items: provider.deviceModelObj.deviceTypeDropdownItemList,
                   onChanged: (value) {
                     provider.setDeviceType(value.id.toString());
                   },
                 ),
-
-                // TextField for updating device location
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: provider.deviceNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Device Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
                 TextField(
                   controller: provider.deviceLocationController,
-                  decoration:
-                      const InputDecoration(labelText: 'Device Location'),
+                  decoration: const InputDecoration(
+                    labelText: 'Location',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: provider.deviceSiteController,
+                  decoration: const InputDecoration(
+                    labelText: 'Site Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 24.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Update1'),
+                      onPressed: () async {
+                        await provider.updateDevice(device.id.toString());
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24.0),
               ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Update'),
-              onPressed: () async {
-                // Call the update device function here
-                await provider.updateDevice(device.id.toString());
-                Navigator.of(context).pop(); // Close the dialog after updating
-              },
-            ),
-          ],
         );
       },
     );
   }
+
+  // void _showUpdateDeviceDialog(
+  //     BuildContext context, DBData device, DeviceProvider provider) {
+  //   // Pre-fill the controllers with the current device values
+  //   provider.deviceTypeController.text = device.deviceTypeName ?? '';
+  //   provider.deviceLocationController.text = device.deviceLocation ?? '';
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled:
+  //         true, // Ensures the bottom sheet adjusts height dynamically
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(
+  //         top: Radius.circular(16.0),
+  //       ),
+  //     ),
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: EdgeInsets.only(
+  //           left: 16.0,
+  //           right: 16.0,
+  //           top: 16.0,
+  //           bottom: MediaQuery.of(context)
+  //               .viewInsets
+  //               .bottom, // Adjusts for the keyboard
+  //         ),
+  //         child: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               Text('Update Device',
+  //                   style: Theme.of(context).textTheme.headlineLarge),
+  //               const SizedBox(height: 16.0),
+  //               // Dropdown for device type
+  //               CustomDropDown(
+  //                 hintText: '-Select Device Type-',
+  //                 items: provider.deviceModelObj.deviceTypeDropdownItemList,
+  //                 onChanged: (value) {
+  //                   provider.setDeviceType(value.id.toString());
+  //                 },
+  //               ),
+  //               const SizedBox(height: 16.0),
+  //               // TextField for updating device location
+  //               TextField(
+  //                 controller: provider.deviceLocationController,
+  //                 decoration: const InputDecoration(
+  //                   labelText: 'Device Location',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 24.0),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 children: [
+  //                   TextButton(
+  //                     child: const Text('Cancel'),
+  //                     onPressed: () {
+  //                       Navigator.of(context).pop();
+  //                     },
+  //                   ),
+  //                   TextButton(
+  //                     child: const Text('Update'),
+  //                     onPressed: () async {
+  //                       // Call the update device function here
+  //                       await provider.updateDevice(device.id.toString());
+  //                       Navigator.of(context)
+  //                           .pop(); // Close the bottom sheet after updating
+  //                     },
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showDeviceDetailsBottomSheet(BuildContext context, DBData device) {
     showModalBottomSheet(
@@ -286,11 +396,11 @@ class DeviceScreenState extends State<DeviceScreen> {
                               },
                             ),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                provider.downloadFile();
-                              },
-                              child: const Text('Download CheckList'))
+                          // TextButton(
+                          //     onPressed: () {
+                          //       provider.downloadFile();
+                          //     },
+                          //     child: const Text('Download CheckList'))
                         ],
                       ),
                     ),
@@ -310,20 +420,32 @@ class DeviceScreenState extends State<DeviceScreen> {
                                 headerColor: appTheme.deepOrangeA100,
                                 gridLineColor: appTheme.pink300),
                             child: SfDataGrid(
+                              allowFiltering: true,
                               source: DeviceDataSource(
-                                  devices: provider.model.dbData ?? [],
-                                  onDelete: (device) =>
-                                      _showDeleteConfirmationDialog(
-                                          context, device, provider),
-                                  onView: (device) =>
-                                      _showDeviceDetailsBottomSheet(
-                                          context, device),
-                                  onUpdate: (device) => _showUpdateDeviceDialog(
-                                      context, device, provider)),
+                                devices: provider.model.dbData ?? [],
+                                onDelete: (device) =>
+                                    _showDeleteConfirmationDialog(
+                                        context, device, provider),
+                                onView: (device) =>
+                                    _showDeviceDetailsBottomSheet(
+                                        context, device),
+                                onUpdate: (device) => _showUpdateDeviceDialog(
+                                    context, device, provider),
+                                onLatestReport: (device) =>
+                                    provider.downloadFile(
+                                  context,
+                                  device.id.toString(),
+                                ),
+                                onPreviousReports: (device) =>
+                                    provider.downloadPreviousFile(
+                                  context,
+                                  device.id.toString(),
+                                ),
+                              ),
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
-                              columnWidthMode: ColumnWidthMode.fitByCellValue,
+                              columnWidthMode: ColumnWidthMode.auto,
                               onQueryRowHeight: (details) {
                                 return 30;
                               },
@@ -341,6 +463,7 @@ class DeviceScreenState extends State<DeviceScreen> {
                                     label:
                                         const Center(child: Text('Site Name'))),
                                 GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'devicekey',
                                     label: const Center(
                                         child: Text('Device Key'))),
@@ -356,6 +479,7 @@ class DeviceScreenState extends State<DeviceScreen> {
                                     columnName: 'status',
                                     label: const Center(child: Text('Status'))),
                                 GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'actions',
                                     label:
                                         const Center(child: Text('Actions'))),
@@ -377,68 +501,80 @@ class DeviceScreenState extends State<DeviceScreen> {
 }
 
 class DeviceDataSource extends DataGridSource {
-  DeviceDataSource(
-      {required List<DBData> devices,
-      required this.onDelete,
-      required this.onView,
-      required this.onUpdate}) {
-    _devices = devices
-        .map<DataGridRow>((device) => DataGridRow(cells: [
-              DataGridCell<String>(
-                  columnName: 'no', value: device.id.toString()),
-              DataGridCell<String>(
-                  columnName: 'name', value: device.deviceName ?? ''),
-              DataGridCell<String>(
-                  columnName: 'sitename', value: device.deviceCiteName ?? ''),
-              DataGridCell<String>(
-                  columnName: 'devicekey', value: device.deviceKey ?? ''),
-              DataGridCell<String>(
-                  columnName: 'devicetype', value: device.deviceTypeName ?? ''),
-              DataGridCell<String>(
-                  columnName: 'location', value: device.deviceLocation ?? ''),
-              DataGridCell<Widget>(
-                  columnName: 'status',
-                  value: Card(
-                    color: device.status == '1'
-                        ? Colors.lightGreen
-                        : Colors.red.withOpacity(.5),
-                    child: Center(
-                        child:
-                            Text(device.status == '1' ? 'Active' : 'Inactive')),
-                  )),
-              DataGridCell<Widget>(
-                  columnName: 'actions',
-                  value: PopupMenuButton<String>(
-                    onSelected: (String value) {
-                      if (value == 'View') {
-                        onView(device);
-                      } else if (value == 'Delete') {
-                        onDelete(device);
-                      } else if (value == 'Update') {
-                        onUpdate(device);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {
-                        'View',
-                        'Delete',
-                        'Update',
-                      }.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  )),
-            ]))
-        .toList();
+  DeviceDataSource({
+    required List<DBData> devices,
+    required this.onDelete,
+    required this.onView,
+    required this.onUpdate,
+    required this.onLatestReport,
+    required this.onPreviousReports,
+  }) {
+    int counter = 1;
+    _devices = devices.map<DataGridRow>((device) {
+      final newRow = DataGridRow(cells: [
+        DataGridCell<String>(columnName: 'no', value: counter.toString()), // No
+        DataGridCell<String>(
+            columnName: 'devicetype',
+            value: device.deviceTypeName ?? ''), // Device Type
+        DataGridCell<String>(
+            columnName: 'sitename',
+            value: device.deviceCiteName ?? ''), // Site Name
+        DataGridCell<String>(
+            columnName: 'devicename',
+            value: device.deviceName ?? ''), // Device Name
+        DataGridCell<String>(
+            columnName: 'location',
+            value: device.deviceLocation ?? ''), // Location
+        DataGridCell<String>(
+            columnName: 'devicekey',
+            value: device.deviceKey ?? ''), // Device Key
+        DataGridCell<String>(
+            columnName: 'status',
+            value: device.status == '1' ? 'Active' : 'Inactive'), // Status
+        DataGridCell<Widget>(
+          columnName: 'actions',
+          value: PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'View') {
+                onView(device);
+              } else if (value == 'Delete') {
+                onDelete(device);
+              } else if (value == 'Update') {
+                onUpdate(device);
+              } else if (value == 'Latest report') {
+                onLatestReport(device);
+              } else if (value == 'Previous reports') {
+                onPreviousReports(device);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {
+                'View',
+                'Delete',
+                'Update',
+                'Latest report',
+                'Previous reports'
+              }.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ), // Actions
+      ]);
+      counter++;
+      return newRow;
+    }).toList();
   }
 
   List<DataGridRow> _devices = [];
   final Function(DBData) onDelete;
   final Function(DBData) onView;
   final Function(DBData) onUpdate;
+  final Function(DBData) onLatestReport;
+  final Function(DBData) onPreviousReports;
 
   @override
   List<DataGridRow> get rows => _devices;
@@ -446,21 +582,29 @@ class DeviceDataSource extends DataGridSource {
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
-      Center(child: Text(row.getCells()[0].value.toString())),
-      Center(child: Text(row.getCells()[1].value.toString())),
-      Center(child: Text(row.getCells()[2].value.toString())),
-      Center(child: Text(row.getCells()[3].value.toString())),
-      Center(child: Text(row.getCells()[4].value.toString())),
-      Center(child: Text(row.getCells()[5].value.toString())),
+      Center(child: Text(row.getCells()[0].value.toString())), // NO
+      Center(child: Text(row.getCells()[1].value.toString())), // Device Type
+      Center(child: Text(row.getCells()[2].value.toString())), // Site Name
+      Center(child: Text(row.getCells()[3].value.toString())), // Device Name
+      Center(child: Text(row.getCells()[4].value.toString())), // Location
+      Center(child: Text(row.getCells()[5].value.toString())), // Device Key
       SizedBox(
         height: 10.v,
         width: 10.h,
-        child: row.getCells()[6].value,
-      ),
+        child: Card(
+          color: row.getCells()[6].value.toString() == 'Active'
+              ? Colors.lightGreen
+              : Colors.red.withOpacity(.5),
+          child: Center(
+              child: Text(row.getCells()[6].value.toString() == 'Active'
+                  ? 'Active'
+                  : 'Inactive')),
+        ),
+      ), // Status
       SizedBox(
         height: 10.v,
         width: 5.h,
-        child: row.getCells()[7].value,
+        child: row.getCells()[7].value, // Actions
       ),
     ]);
   }

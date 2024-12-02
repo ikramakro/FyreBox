@@ -1,14 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fyrebox/data/models/user_data_model.dart';
-import 'package:fyrebox/theme/theme_helper.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
 import '../../core/app_export.dart';
 import '../../widgets/custom_drop_down.dart';
 import 'models/user_model.dart';
 import 'provider/user_provider.dart';
-import 'package:intl/intl.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -29,33 +28,34 @@ class UserScreenState extends State<UserScreen> {
   void initState() {
     super.initState();
   }
-void _showDeleteConfirmationDialog(
-    BuildContext context, DBDATA user, UserProvider provider) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Delete User'),
-        content: const Text('Are you sure you want to delete this user?'),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text('Delete'),
-            onPressed: () async {
-              await provider.deleteUser(user.id.toString());
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+
+  void _showDeleteConfirmationDialog(
+      BuildContext context, DBDATA user, UserProvider provider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text('Are you sure you want to delete this user?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                await provider.deleteUser(user.id.toString());
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showUserDetailsBottomSheet(BuildContext context, DBDATA user) {
     showModalBottomSheet(
@@ -97,7 +97,7 @@ void _showDeleteConfirmationDialog(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Role', style: CustomTextStyles.labelLargeBold),
-                    Text('${user.userRole == '1' ? 'Admin' : 'Agent'}',
+                    Text(user.userRole == '1' ? 'Admin' : 'Artisan',
                         style: CustomTextStyles.labelLargeBold),
                   ],
                 ),
@@ -292,9 +292,12 @@ void _showDeleteConfirmationDialog(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: SfDataGridTheme(
                             data: SfDataGridThemeData(
-                                headerColor: appTheme.deepOrangeA100,
-                                gridLineColor: appTheme.pink300),
+                              headerColor: appTheme.deepOrangeA100,
+                              gridLineColor: appTheme.pink300,
+                            ),
                             child: SfDataGrid(
+                              allowFiltering: true,
+                              autoExpandGroups: true,
                               source: UserDataSource(
                                   users: provider.model.dBDATA ?? [],
                                   onDelete: (user) =>
@@ -305,7 +308,7 @@ void _showDeleteConfirmationDialog(
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
-                              columnWidthMode: ColumnWidthMode.fitByCellValue,
+                              columnWidthMode: ColumnWidthMode.auto,
                               onQueryRowHeight: (details) {
                                 return 30;
                               },
@@ -331,6 +334,7 @@ void _showDeleteConfirmationDialog(
                                     label:
                                         const Center(child: Text('Reg Date'))),
                                 GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'actions',
                                     label:
                                         const Center(child: Text('Actions'))),
@@ -352,62 +356,53 @@ void _showDeleteConfirmationDialog(
 }
 
 class UserDataSource extends DataGridSource {
-  UserDataSource(
-      {required List<DBDATA> users,
-      required this.onDelete,
-      required this.onView}) {
-    _users = users
-        .map<DataGridRow>((user) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'id', value: user.id.toString()),
-              DataGridCell<String>(columnName: 'name', value: user.userName),
-              DataGridCell<String>(columnName: 'email', value: user.userEmail),
-              DataGridCell<String>(
-                  columnName: 'role',
-                  value: user.userRole == '1' ? 'Admin' : "Agent"),
-              DataGridCell<Widget>(
-                  columnName: 'status',
-                  value: Card(
-                    color: user.status == '1'
-                        ? Colors.lightGreen
-                        : Colors.red.withOpacity(.5),
-                    // padding: EdgeInsets.all(10),
-                    // margin: EdgeInsets.all(5),
-
-                    child: Center(
-                        child:
-                            Text(user.status == '1' ? 'Active' : 'In Active')),
-                  )),
-              DataGridCell<DateTime>(
-                  columnName: 'regDate',
-                  value: DateTime.fromMillisecondsSinceEpoch(
-                      int.parse(user.entryTime .toString()?? '') * 1000)),
-              DataGridCell<Widget>(
-                  columnName: 'actions',
-                  value: PopupMenuButton<String>(
-                    // child: Text('Action'),
-                    // // iconSize: 10,
-                    // constraints: const BoxConstraints(
-                    //   minWidth: 5,
-                    //   maxWidth: 10,
-                    // ),
-                    onSelected: (String value) {
-                      if (value == 'View') {
-                        onView(user);
-                      } else if (value == 'Delete') {
-                        onDelete(user);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'View', 'Delete'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  )),
-            ]))
-        .toList();
+  UserDataSource({
+    required List<DBDATA> users,
+    required this.onDelete,
+    required this.onView,
+  }) {
+    int counter = 1; // Initialize counter starting from 1
+    _users = users.map<DataGridRow>((user) {
+      final newRow = DataGridRow(cells: [
+        DataGridCell<String>(
+            columnName: 'id', value: counter.toString()), // Use counter for ID
+        DataGridCell<String>(columnName: 'name', value: user.userName),
+        DataGridCell<String>(columnName: 'email', value: user.userEmail),
+        DataGridCell<String>(
+            columnName: 'role',
+            value: user.userRole == '1' ? 'Admin' : "Artisan"),
+        DataGridCell<String>(
+          columnName: 'status',
+          value: user.status == '1' ? 'Active' : 'In Active',
+        ),
+        DataGridCell<DateTime>(
+            columnName: 'regDate',
+            value: DateTime.fromMillisecondsSinceEpoch(
+                int.parse(user.entryTime.toString() ?? '') * 1000)),
+        DataGridCell<Widget>(
+          columnName: 'actions',
+          value: PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'View') {
+                onView(user);
+              } else if (value == 'Delete') {
+                onDelete(user);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'View', 'Delete'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ),
+      ]);
+      counter++; // Increment the counter for the next ID
+      return newRow;
+    }).toList();
   }
 
   List<DataGridRow> _users = [];
@@ -427,7 +422,15 @@ class UserDataSource extends DataGridSource {
       SizedBox(
         height: 10.v,
         width: 10.h,
-        child: row.getCells()[4].value,
+        child: Card(
+          color: row.getCells()[4].value == 'Active'
+              ? Colors.lightGreen
+              : Colors.red.withOpacity(.5),
+          child: Center(
+              child: Text(row.getCells()[4].value == 'Active'
+                  ? 'Active'
+                  : 'In Active')),
+        ),
       ),
       Center(
           child:

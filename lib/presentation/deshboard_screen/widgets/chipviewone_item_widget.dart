@@ -36,7 +36,7 @@ class ChipviewoneItemWidget extends StatelessWidget {
           showCheckmark: false,
           labelPadding: EdgeInsets.zero,
           label: Text(
-            chipviewoneItem,
+            " $chipviewoneItem",
             style: TextStyle(
               color: appTheme.blueGray900,
               fontSize: 24.fSize,
@@ -45,9 +45,9 @@ class ChipviewoneItemWidget extends StatelessWidget {
             ),
           ),
           avatar: Container(
-            // height: 40.h,
-            // width: 40.h,
-            margin: EdgeInsets.only(right: 5.h),
+            height: 50.h,
+            width: 50.h,
+            // margin: EdgeInsets.only(right: 5.h),
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
             child: Center(
               child: Icon(
@@ -59,7 +59,7 @@ class ChipviewoneItemWidget extends StatelessWidget {
           ),
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-              side: BorderSide(color: Colors.white),
+              side: const BorderSide(color: Colors.white),
               borderRadius: BorderRadius.circular(
                 10.h,
               )),

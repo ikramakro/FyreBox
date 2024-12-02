@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
@@ -93,6 +94,26 @@ class AlertsProvider extends ChangeNotifier {
       }
     });
   }
+
+  Future<void> archivealert(
+    String alertId,
+  ) async {
+    // USERDATA userdata = prefUtils.getUserData()!;
+
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'archive_alert',
+        'alert_id': alertId,
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        await loadAlertData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error Deleting alert status.');
+      }
+    });
+  }
   // void onChanged(String value) async {
   //   // For filtered data
   //   String org = await prefUtils.getOrgValue('orgid');
@@ -155,7 +176,11 @@ class AlertsProvider extends ChangeNotifier {
         'operation': 'get_alerts',
         'access_token': 'developer_bypass',
         'org_id': userdata.orgId,
-        'status': value == 'Active' ? '1' : '0'
+        'status': value == 'Active'
+            ? '1'
+            : value == 'In-Active'
+                ? '0'
+                : '3'
       },
     ).then((value) async {
       model = value;

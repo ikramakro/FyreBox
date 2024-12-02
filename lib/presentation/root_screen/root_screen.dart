@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:fyrebox/data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
-import 'package:provider/provider.dart';
 import 'package:fyrebox/presentation/device_screen/device_screen.dart';
 import 'package:fyrebox/presentation/root_screen/provider/root_provider.dart';
+
 import '../../core/app_export.dart';
 import '../../core/utils/constant.dart';
 import '../alerts_screen/alerts_screen.dart';
 import '../contact/contact_screen.dart';
 import '../deshboard_screen/deshboard_screen.dart';
-import '../emergency_screen/add_emergency_screen.dart';
 import '../emergency_screen/emergency_screen.dart';
 import '../setting/setting_screen.dart';
 import '../user_screen/user_screen.dart';
@@ -80,7 +78,7 @@ class RootScreenState extends State<RootScreen> {
                                   ? 'Emergency Screen'
                                   : _selectedIndex == 6
                                       ? 'Setting Screen'
-                                      : 'Contact FyreBox'),
+                                      : 'Contact Fyrebox'),
           backgroundColor: const Color(0xffd61a21),
           leading: IconButton(
             icon: const Icon(Icons.menu),
@@ -156,6 +154,7 @@ class RootScreenState extends State<RootScreen> {
                       // sp.saveToDisk('orgid', postLoginDeviceAuthResp.uSERDATA?.orgId ?? '');
                       await prefUtils.setUserData(USERDATA());
                       await prefUtils.setBoolValue('isLogin', false);
+                      prefUtils.setAccessToken('');
                       NavigatorService.pushNamedAndRemoveUntil(
                           AppRoutes.loginScreen);
                       // Handle logout functionality
@@ -177,26 +176,22 @@ class RootScreenState extends State<RootScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xffd61a21).withOpacity(.6),
                 ),
-                child: Column(
-                  children: [
-                    CustomImageView(
-                      imagePath: ImageConstant.imgFyreboxLogo,
-                      height: 112.h,
-                      width: double.maxFinite,
-                      margin: EdgeInsets.only(right: 16.h),
-                      fit: BoxFit.contain,
-                    ),
-                  ],
+                child: CustomImageView(
+                  imagePath: ImageConstant.imgFyreboxLogo,
+                  // height: 112.h,
+                  // width: double.maxFinite,
+                  margin: EdgeInsets.only(right: 16.h),
+                  fit: BoxFit.contain,
                 ),
               ),
-              _buildDrawerItem(0, 'DashBoard'),
+              _buildDrawerItem(0, 'Dashboard'),
               _buildDrawerItem(1, 'User'),
               _buildDrawerItem(2, 'Devices'),
               _buildDrawerItem(3, 'Alerts'),
               _buildDrawerItem(4, 'Visitors'),
               _buildDrawerItem(5, 'Emergency \nContact'),
               _buildDrawerItem(6, 'Settings'),
-              _buildDrawerItem(7, 'Contact \nFyreBox'),
+              _buildDrawerItem(7, 'Contact \nFyrebox'),
             ],
           ),
         ),

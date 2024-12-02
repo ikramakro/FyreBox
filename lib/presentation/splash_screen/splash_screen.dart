@@ -38,9 +38,11 @@ class SplashScreenState extends State<SplashScreen> {
 
     // Navigate after a delay
     await Future.delayed(const Duration(milliseconds: 3000));
-    NavigatorService.popAndPushNamed(
-      isLogin != null ? AppRoutes.rootScreen : AppRoutes.loginScreen,
-    );
+    if (isLogin != null && isLogin != '') {
+      NavigatorService.popAndPushNamed(AppRoutes.rootScreen);
+    } else {
+      NavigatorService.popAndPushNamed(AppRoutes.loginScreen);
+    }
   }
 
   @override

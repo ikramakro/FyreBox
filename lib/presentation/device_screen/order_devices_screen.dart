@@ -1,4 +1,5 @@
 import 'package:fyrebox/core/app_export.dart';
+import 'package:fyrebox/presentation/device_screen/provider/add_device_provider.dart';
 import 'package:fyrebox/widgets/custom_text_form_field1.dart';
 import '../../widgets/custom_drop_down.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -12,7 +13,7 @@ class OrderDeviceScreen extends StatefulWidget {
 
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => DeviceProvider(),
+      create: (context) => AddDeviceProvider(),
       child: const OrderDeviceScreen(),
     );
   }
@@ -28,7 +29,8 @@ class OrderDeviceScreenState extends State<OrderDeviceScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Consumer<DeviceProvider>(builder: (context, provider, child) {
+          child:
+              Consumer<AddDeviceProvider>(builder: (context, provider, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -42,7 +44,8 @@ class OrderDeviceScreenState extends State<OrderDeviceScreen> {
                   items:
                       provider.deviceModelObj.orderdeviceTypeDropdownItemList,
                   onChanged: (value) {
-                    provider.setOrderDeviceType(value.id.toString());
+                    provider.setOrderDeviceType(
+                        value.id.toString(), value.title);
                   },
                 ),
                 const SizedBox(height: 16.0),

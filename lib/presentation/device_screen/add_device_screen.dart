@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fyrebox/core/app_export.dart';
+import 'package:fyrebox/presentation/device_screen/provider/add_device_provider.dart';
 import 'package:fyrebox/widgets/custom_text_form_field1.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/custom_drop_down.dart';
@@ -15,7 +16,7 @@ class AddDeviceScreen extends StatefulWidget {
 
   static Widget builder(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => DeviceProvider(),
+      create: (context) => AddDeviceProvider(),
       child: const AddDeviceScreen(),
     );
   }
@@ -31,7 +32,8 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Consumer<DeviceProvider>(builder: (context, provider, child) {
+          child:
+              Consumer<AddDeviceProvider>(builder: (context, provider, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -39,7 +41,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   hintText: '-- Select Device Type --',
                   items: provider.deviceModelObj.deviceTypeDropdownItemList,
                   onChanged: (value) {
-                    provider.setDeviceType(value.id.toString());
+                    provider.setDeviceType(value.id.toString(), value.title);
                   },
                 ),
                 const SizedBox(height: 16.0),

@@ -1,9 +1,8 @@
-import 'package:fyrebox/core/utils/navigator_service.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 import '../../core/app_export.dart';
 import '../../core/utils/constant.dart';
 import 'provider/deshboard_provider.dart';
-import 'widgets/chipviewone_item_widget.dart';
 
 class DeshboardScreen extends StatefulWidget {
   const DeshboardScreen({super.key});
@@ -109,35 +108,22 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 provider.model.dBDATA?.totalMyDueInvoices.toString() ?? '',
                 provider.model.dBDATA?.totalMyVisitors.toString() ?? ''
               ];
-              List name = [
-                'Total Alerts',
-                'Total Devices',
-                'Due Invoices',
-                'Total Visitors'
-              ];
-              List icon = [
-                Icons.warning,
-                Icons.devices,
-                Icons.inventory,
-                Icons.person
-              ];
+              List name = ['Total Alerts', 'Total Devices', 'Total Visitors'];
+              List icon = [Icons.warning, Icons.devices, Icons.person];
 
               List bgColor = [
                 appTheme.pink50,
                 appTheme.orange50,
-                appTheme.green50,
                 appTheme.purple50
               ];
               List color = [
-                appTheme.pink300,
-                appTheme.deepOrangeA100,
-                appTheme.green500,
-                appTheme.deepPurpleA100
+                Colors.blue,
+                Colors.purple,
+                Colors.green,
               ];
               List navigator = [
                 3,
                 2,
-                1,
                 4,
               ];
               return GridView.builder(
@@ -147,22 +133,16 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 20.h,
                   mainAxisSpacing: 20.h,
-                  childAspectRatio: 1.5,
+                  childAspectRatio: 2 / 2.5,
                 ),
-                itemCount: 4,
+                itemCount: 3,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () => NavigatorService.pushNamed(
-                        AppRoutes.rootScreen,
-                        arguments: navigator[index]),
-                    child: ChipviewoneItemWidget(
-                      text: name[index],
-                      chipviewoneItem: count[index],
-                      icon: icon[index],
-                      backgroundColor: bgColor[index],
-                      color: color[index],
-                    ),
-                  );
+                      onTap: () => NavigatorService.pushNamed(
+                          AppRoutes.rootScreen,
+                          arguments: navigator[index]),
+                      child: _buildStatCard(
+                          name[index], count[index], color[index], '0'));
                 },
               );
             },
@@ -172,6 +152,36 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
       ),
     );
   }
+
+  Widget _buildStatCard(
+      String title, String count, Color color, String percentage) {
+    return Card(
+      color: color.withOpacity(0.1),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(fontSize: 16.0, color: color),
+            ),
+            Text(
+              count,
+              style: TextStyle(
+                  fontSize: 28.0, fontWeight: FontWeight.bold, color: color),
+            ),
+            Text(
+              percentage,
+              style: TextStyle(fontSize: 16.0, color: color),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Widget _buildTodaySalesSummary(BuildContext context) {
   //   return Container(
   //     width: double.maxFinite,
@@ -291,39 +301,54 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   Widget _buildEvacuationMapSection(BuildContext context) {
     print(
         '232323232323232333039458034584059850843098509999999999==============================${dbData?.orgEvacuationMap}');
-    return Container(
-      width: double.maxFinite,
-      margin: EdgeInsets.only(right: 4.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: 14.h,
-        vertical: 18.h,
-      ),
-      decoration: AppDecoration.outlineGray.copyWith(
-        borderRadius: BorderRadiusStyle.roundedBorder20,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 4.h),
-          Padding(
-            padding: EdgeInsets.only(left: 16.h),
-            child: Text(
-              "lbl_evacuation_map".tr,
-              style: CustomTextStyles.titleLargeGray900,
+    return InkWell(
+      onTap: () {
+        final imageProvider = Image.network(
+                'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap ?? ''}')
+            .image;
+        showImageViewer(
+          context,
+          imageProvider,
+          onViewerDismissed: () {
+            print("dismissed");
+          },
+          doubleTapZoomable: true,
+        );
+      },
+      child: Container(
+        width: double.maxFinite,
+        margin: EdgeInsets.only(right: 4.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 14.h,
+          vertical: 18.h,
+        ),
+        decoration: AppDecoration.outlineGray.copyWith(
+          borderRadius: BorderRadiusStyle.roundedBorder20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 4.h),
+            Padding(
+              padding: EdgeInsets.only(left: 16.h),
+              child: Text(
+                "lbl_evacuation_map".tr,
+                style: CustomTextStyles.titleLargeGray900,
+              ),
             ),
-          ),
-          SizedBox(height: 6.h),
-          Consumer<DeshboardProvider>(builder: (context, provider, child) {
-            return CustomImageView(
-              imagePath:
-                  'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap ?? ''}',
-              height: 268.h,
-              width: double.maxFinite,
-            );
-          })
-        ],
+            SizedBox(height: 6.h),
+            Consumer<DeshboardProvider>(builder: (context, provider, child) {
+              return CustomImageView(
+                imagePath:
+                    'https://fyreboxhub.com/assets/images/${dbData?.orgEvacuationMap ?? ''}',
+                height: 268.h,
+                width: double.maxFinite,
+              );
+            })
+          ],
+        ),
       ),
     );
   }

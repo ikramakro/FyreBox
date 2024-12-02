@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
@@ -14,7 +15,8 @@ class EmergencyProvider extends ChangeNotifier {
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
-
+  TextEditingController nameController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   EmergencyProvider() {
     init();
   }
@@ -113,12 +115,14 @@ class EmergencyProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> updateHelpline(DBDATA alert) async {
+  Future<void> updateHelpline(DBDATA alert, String status) async {
     await _repository.orderDevice(
       formData: {
-        'operation': 'update_alert',
-        'access_token': 'developer_bypass',
-        'alert_id': alert.id,
+        'name': nameController.text,
+        'operation': 'update_helpline',
+        'address': addressController.text,
+        'helpline_id': alert.id,
+        'status': status
         // 'device_id': alert.deviceId,
         // 'alert_type': alert.alertType,
         // 'status': alert.status,
@@ -129,6 +133,7 @@ class EmergencyProvider extends ChangeNotifier {
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
+        await loadEmergencyData();
         showSuccess(value.dESCRIPTION ?? '');
       } else {
         showError(value.eRRORDESCRIPTION ?? '');

@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:fyrebox/data/models/alert_model.dart';
 import 'package:fyrebox/presentation/alerts_screen/models/alerts_model.dart';
+import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
 import '../../core/app_export.dart';
 import '../../widgets/customCheckbox.dart';
 import '../../widgets/custom_drop_down.dart'; // Replace CustomRadioButton with CustomCheckbox
 import 'provider/alerts_provider.dart';
-
-import 'package:syncfusion_flutter_core/theme.dart';
 
 class AlertScreen extends StatefulWidget {
   const AlertScreen({super.key});
@@ -207,62 +206,76 @@ class AlertScreenState extends State<AlertScreen> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: SfDataGridTheme(
-                            data: SfDataGridThemeData(
-                                headerColor: appTheme.deepOrangeA100,
-                                gridLineColor: appTheme.pink300),
-                            child: SfDataGrid(
-                              source: AlertDataSource(
+                              data: SfDataGridThemeData(
+                                  headerColor: appTheme.deepOrangeA100,
+                                  gridLineColor: appTheme.pink300),
+                              child: SfDataGrid(
+                                allowFiltering: true,
+                                source: AlertDataSource(
                                   alerts: provider.model.dBDATA ?? [],
                                   onUpdate: (alert) => _showUpdateAlertPopup(
                                       context, alert, provider),
                                   onDelete: (alert) =>
                                       _showDeleteConfirmationDialog(
-                                          context, alert, provider)),
-                              gridLinesVisibility: GridLinesVisibility.both,
-                              headerGridLinesVisibility:
-                                  GridLinesVisibility.both,
-                              columnWidthMode: ColumnWidthMode.fitByCellValue,
-                              onQueryRowHeight: (details) {
-                                return 30;
-                              },
-                              columns: <GridColumn>[
-                                GridColumn(
-                                  columnName: 'no',
-                                  label: const Center(child: Text('No')),
+                                          context, alert, provider),
+                                  onDeviceTypeClick: (alert) =>
+                                      _showDeviceKeyPopup(context, alert),
+                                  archiveAlert: (alert) => provider
+                                      .archivealert(alert.id.toString()),
                                 ),
-                                GridColumn(
-                                    columnName: 'color',
-                                    width: 50,
-                                    label: const Center(child: Text('Color'))),
-                                GridColumn(
-                                    columnName: 'alert',
-                                    label: const Center(child: Text('Alert'))),
-                                GridColumn(
-                                    columnName: 'deviceKey',
-                                    label: const Center(
-                                        child: Text('Device Key'))),
-                                GridColumn(
-                                    columnName: 'client',
-                                    label: const Center(child: Text('Client'))),
-                                GridColumn(
-                                    columnName: 'description',
-                                    label: const Center(
-                                        child: Text('Description')),
-                                    width: 200),
-                                GridColumn(
-                                    columnName: 'status',
-                                    label: const Center(child: Text('Status'))),
-                                GridColumn(
-                                    columnName: 'entryTime',
-                                    label: const Center(
-                                        child: Text('Entry Time'))),
-                                GridColumn(
-                                    columnName: 'actions',
-                                    label:
-                                        const Center(child: Text('Actions'))),
-                              ],
-                            ),
-                          ),
+                                gridLinesVisibility: GridLinesVisibility.both,
+                                headerGridLinesVisibility:
+                                    GridLinesVisibility.both,
+                                columnWidthMode: ColumnWidthMode.auto,
+                                onQueryRowHeight: (details) => 30,
+                                columns: <GridColumn>[
+                                  GridColumn(
+                                      columnName: 'no',
+                                      label: const Center(child: Text('No'))),
+                                  GridColumn(
+                                      allowFiltering: false,
+                                      columnName: 'color',
+                                      width: 100,
+                                      label:
+                                          const Center(child: Text('Color'))),
+                                  GridColumn(
+                                      columnName: 'alert',
+                                      label:
+                                          const Center(child: Text('Alert'))),
+                                  GridColumn(
+                                      columnName: 'deviceType',
+                                      label: const Center(
+                                          child: Text('Device Type'))),
+                                  GridColumn(
+                                      columnName: 'location',
+                                      label: const Center(
+                                          child: Text('Location'))),
+                                  GridColumn(
+                                      columnName: 'client',
+                                      label:
+                                          const Center(child: Text('Client'))),
+                                  GridColumn(
+                                      allowFiltering: false,
+                                      columnName: 'description',
+                                      width: 200,
+                                      label: const Center(
+                                          child: Text('Description'))),
+                                  GridColumn(
+                                      allowFiltering: false,
+                                      columnName: 'status',
+                                      label:
+                                          const Center(child: Text('Status'))),
+                                  GridColumn(
+                                      columnName: 'entryTime',
+                                      label: const Center(
+                                          child: Text('Entry Time'))),
+                                  GridColumn(
+                                      allowFiltering: false,
+                                      columnName: 'actions',
+                                      label:
+                                          const Center(child: Text('Actions'))),
+                                ],
+                              )),
                         ),
                       );
                     }),
@@ -277,97 +290,124 @@ class AlertScreenState extends State<AlertScreen> {
   }
 }
 
+void _showDeviceKeyPopup(BuildContext context, DBDATA alert) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text('Device Key'),
+      content: Text(alert.deviceKey ?? 'No Key Available'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+}
+
 class AlertDataSource extends DataGridSource {
-  AlertDataSource(
-      {required List<DBDATA> alerts,
-      required this.onUpdate,
-      required this.onDelete}) {
-    _alerts = alerts
-        .map<DataGridRow>((alert) => DataGridRow(cells: [
-              DataGridCell<String>(
-                  columnName: 'no', value: alert.id.toString()),
-              DataGridCell<Widget>(
-                  columnName: 'color',
-                  value: Container(
-                    height: 20,
-                    width: 30,
-                    color: alert.alertColor != null
-                        ? Color(int.parse(
-                            alert.alertColor!.replaceFirst('#', '0xff')))
-                        : Colors.transparent,
-                  )),
-              DataGridCell<String>(columnName: 'alert', value: alert.alertName),
-              DataGridCell<String>(
-                  columnName: 'deviceKey', value: alert.deviceKey),
-              DataGridCell<String>(columnName: 'client', value: alert.orgName),
-              DataGridCell<String>(
-                columnName: 'description',
-                value: alert.alertDescription,
+  AlertDataSource({
+    required List<DBDATA> alerts,
+    required this.onUpdate,
+    required this.onDelete,
+    required this.onDeviceTypeClick,
+    required this.archiveAlert,
+  }) {
+    int counter = 1;
+    _alerts = alerts.map<DataGridRow>((alert) {
+      final row = DataGridRow(cells: [
+        DataGridCell<String>(columnName: 'no', value: counter.toString()),
+        DataGridCell<Widget>(
+          columnName: 'color',
+          value: Container(
+            width: 20,
+            height: 20,
+            color:
+                Color(int.parse(alert.alertColor!.replaceFirst('#', '0xff'))),
+          ),
+        ),
+        DataGridCell<String>(columnName: 'alert', value: alert.alertName),
+        DataGridCell<Widget>(
+          columnName: 'deviceType',
+          value: GestureDetector(
+            onTap: () => onDeviceTypeClick(alert),
+            child: Text(
+              alert.devicetypename ?? '-',
+              style: const TextStyle(
+                color: Colors.blue,
+                decoration: TextDecoration.underline,
               ),
-              DataGridCell<Widget>(
-                  columnName: 'status',
-                  value: Card(
-                    color: alert.status == '1'
-                        ? Colors.lightGreen
-                        : Colors.red.withOpacity(.5),
-                    child: Center(
-                        child:
-                            Text(alert.status == '1' ? 'Active' : 'Inactive')),
-                  )),
-              DataGridCell<String>(
-                  columnName: 'entryTime', value: alert.entryTimeFormated),
-              DataGridCell<Widget>(
-                  columnName: 'actions',
-                  value: PopupMenuButton<String>(
-                    onSelected: (String value) {
-                      if (value == 'Update') {
-                        onUpdate(alert);
-                      } else if (value == 'Delete') {
-                        onDelete(alert);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'Update', 'Delete'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  )),
-            ]))
-        .toList();
+            ),
+          ),
+        ),
+        DataGridCell<String>(
+            columnName: 'location', value: alert.devicelocation),
+        DataGridCell<String>(columnName: 'client', value: alert.orgName),
+        DataGridCell<String>(
+            columnName: 'description', value: alert.alertDescription),
+        DataGridCell<Widget>(
+          columnName: 'status',
+          value: Center(
+              child: SizedBox(
+            width: 100,
+            height: 70,
+            child: Card(
+              color: alert.status == '1'
+                  ? Colors.lightGreen
+                  : Colors.red.withOpacity(.5),
+              child: Center(
+                  child: Text(alert.status == '1' ? 'Active' : 'Inactive')),
+            ),
+          )),
+        ),
+        DataGridCell<String>(
+            columnName: 'entryTime', value: alert.entryTimeFormated),
+        DataGridCell<Widget>(
+          columnName: 'actions',
+          value: PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'Update') {
+                onUpdate(alert);
+              } else if (value == 'Delete') {
+                onDelete(alert);
+              } else if (value == 'Archive') {
+                archiveAlert(alert);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'Update', 'Delete', 'Archive'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ),
+      ]);
+      counter++;
+      return row;
+    }).toList();
   }
 
   List<DataGridRow> _alerts = [];
   final Function(DBDATA) onUpdate;
   final Function(DBDATA) onDelete;
-
+  final Function(DBDATA) onDeviceTypeClick;
+  final Function(DBDATA) archiveAlert;
   @override
   List<DataGridRow> get rows => _alerts;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
-    return DataGridRowAdapter(cells: [
-      Center(child: Text(row.getCells()[0].value.toString())),
-      Center(child: row.getCells()[1].value),
-      Center(child: Text(row.getCells()[2].value.toString())),
-      Center(
-          child: Text(
-        row.getCells()[3].value.toString(),
-        maxLines: 2,
-      )),
-      Center(child: Text(row.getCells()[4].value.toString())),
-      Center(
-        child: Text(
-          row.getCells()[5].value.toString(),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-      Center(child: row.getCells()[6].value),
-      Center(child: Text(row.getCells()[7].value.toString())),
-      Center(child: row.getCells()[8].value),
-    ]);
+    return DataGridRowAdapter(
+      cells: row.getCells().map((cell) {
+        return Center(
+          child:
+              cell.value is Widget ? cell.value : Text(cell.value.toString()),
+        );
+      }).toList(),
+    );
   }
 }

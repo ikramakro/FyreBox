@@ -16,6 +16,14 @@ class VistorModel {
       id: 2,
       title: "In-Active",
     ),
+    SelectionPopupModel(
+      id: 3,
+      title: "Permanent Employees",
+    ),
+    SelectionPopupModel(
+      id: 3,
+      title: "Archived Visitors",
+    ),
   ];
   List<SelectionPopupModel> deviceTypeDropdownItemList = [
     SelectionPopupModel(
@@ -24,7 +32,7 @@ class VistorModel {
     ),
     SelectionPopupModel(
       id: 1,
-      title: "Agent",
+      title: "Artisan",
       isSelected: true,
     ),
   ];

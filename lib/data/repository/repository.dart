@@ -1,3 +1,6 @@
+import 'package:fyrebox/data/models/device_type.dart';
+import 'package:fyrebox/data/models/org_type.dart';
+
 import '../../core/utils/constant.dart';
 import '../apiClient/api_client.dart';
 
@@ -21,6 +24,19 @@ class Repository {
     final response = await _apiClient.get(
         baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
     return AuthResponse.fromJson(response.data);
+  }
+
+  Future<DeviceTypeResponse> deviceType(
+      {Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
+    return DeviceTypeResponse.fromJson(response.data);
+  }
+
+  Future<OrgType> orgType({Map<String, dynamic>? formData}) async {
+    final response = await _apiClient.get(
+        baseUrl: 'https://fyreboxhub.com/api/get_data', formData: formData);
+    return OrgType.fromJson(response.data);
   }
 
   Future<DashboardModel> dashboardData({Map<String, dynamic>? formData}) async {

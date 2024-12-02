@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:toastification/toastification.dart';
 import 'core/app_export.dart';
@@ -8,8 +9,14 @@ import 'presentation/alerts_screen/provider/alerts_provider.dart';
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(
+      debug:
+          true, // optional: set to false to disable printing logs to console (default: true)
+      ignoreSsl:
+          true // option: set to false to disable working with http links (default: false)
+      );
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
     PrefUtils().init()
@@ -40,7 +47,7 @@ class MyApp extends StatelessWidget {
           child: ToastificationWrapper(
             child: MaterialApp(
               scaffoldMessengerKey: scaffoldKey,
-              title: 'FyreBox',
+              title: 'Fyrebox',
               debugShowCheckedModeBanner: false,
               theme: theme,
               navigatorKey: NavigatorService.navigatorKey,

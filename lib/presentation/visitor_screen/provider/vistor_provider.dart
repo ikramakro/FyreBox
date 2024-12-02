@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
@@ -14,13 +15,14 @@ class VisitorProvider extends ChangeNotifier {
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
-
+  USERDATA? userdata;
   VisitorProvider() {
     init();
   }
 
   init() async {
     await loadVisitorData();
+    userdata = prefUtils.getUserData();
   }
 
   FutureOr<void> loadVisitorData({
@@ -30,11 +32,7 @@ class VisitorProvider extends ChangeNotifier {
     USERDATA userdata = prefUtils.getUserData()!;
 
     await _repository.vistorData(
-      formData: {
-        'operation': 'get_visitor',
-        'access_token': 'developer_bypass',
-        'org_id': userdata.orgId
-      },
+      formData: {'operation': 'get_visitor', 'org_id': userdata.orgId},
     ).then((value) async {
       model = value;
       if (model.sTATUS != "ERROR") {
@@ -101,7 +99,13 @@ class VisitorProvider extends ChangeNotifier {
         'operation': 'get_visitors',
         // 'access_token': 'developer_bypass',
         'org_id': userdata.orgId,
-        'status': value == 'Active' ? '1' : '0'
+        'status': value == 'Active'
+            ? '1'
+            : value == 'In-Active'
+                ? '0'
+                : value == 'Permanent Employees'
+                    ? '4'
+                    : '2'
       },
     ).then((value) async {
       model = value;

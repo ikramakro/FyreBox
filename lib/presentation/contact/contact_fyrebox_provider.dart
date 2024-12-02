@@ -23,7 +23,7 @@ class ContactFyreBoxProvider extends ChangeNotifier {
   }
 
   void init() async {
-    userdata = await prefUtils.getUserData();
+    userdata = prefUtils.getUserData();
   }
 
   void setPriority(String priority) {
@@ -39,7 +39,7 @@ class ContactFyreBoxProvider extends ChangeNotifier {
           'contact_priority': selectedPriority,
           'contact_description': descriptionController.text,
           'operation': 'contact_fyrebox',
-          'access_token': 'developer_bypass',
+          // 'access_token': 'developer_bypass',
           'org_id': userdata?.orgId ?? ''
         },
       );

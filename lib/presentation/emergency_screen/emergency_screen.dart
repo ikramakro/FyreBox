@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:fyrebox/data/models/emergency_model.dart';
-import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_switch/flutter_switch.dart';
+
 import '../../core/app_export.dart';
 import '../../widgets/custom_text_form_field1.dart';
 import 'provider/emergency_provider.dart';
-
-import 'package:syncfusion_flutter_core/theme.dart';
 
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
@@ -23,78 +19,100 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     super.initState();
   }
 
-  // Method to show the update helpline popup
-  void _showUpdateHelplinePopup(BuildContext context, DBDATA helpline) {
+  void _showUpdateHelplinePopup(
+      BuildContext context, DBDATA helpline, EmergencyProvider provider) {
+    // Initialize controllers and the status value
+    provider.nameController = TextEditingController(text: helpline.name);
+    provider.addressController = TextEditingController(text: helpline.address);
+    String status = helpline.status ?? ''; // Store the initial status
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Update Helpline Details'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 10.0),
-                const Text('Helpline Name:', style: TextStyle(fontSize: 12.0)),
-                CustomTextFormField1(
-                  hintText: helpline.name,
-                ),
-                const SizedBox(height: 10.0),
-                const Text('Helpline Status:',
-                    style: TextStyle(fontSize: 12.0)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Checkbox(
-                      value: helpline.status == '1',
-                      onChanged: (value) {
-                        setState(() {
-                          if (value == true) {
-                            helpline.status = '1'; // Set to Active
-                          } else {
-                            helpline.status =
-                                '0'; // Uncheck, so set to Inactive
-                          }
-                        });
-                      },
-                    ),
-                    const Text('Active'),
-                    Checkbox(
-                      value: helpline.status == '0',
-                      onChanged: (value) {
-                        setState(() {
-                          if (value == true) {
-                            helpline.status = '0'; // Set to Inactive
-                          } else {
-                            helpline.status = '1'; // Uncheck, so set to Active
-                          }
-                        });
-                      },
-                    ),
-                    const Text('Inactive'),
-                  ],
-                )
-              ],
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Update Helpline Details'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10.0),
+                  const Text('Helpline Name:',
+                      style: TextStyle(fontSize: 12.0)),
+                  CustomTextFormField1(
+                    controller: provider.nameController,
+                    hintText: 'Enter helpline name',
+                  ),
+                  const SizedBox(height: 10.0),
+                  const Text('Helpline Address:',
+                      style: TextStyle(fontSize: 12.0)),
+                  CustomTextFormField1(
+                    controller: provider.addressController,
+                    hintText: 'Enter helpline address',
+                  ),
+                  const SizedBox(height: 10.0),
+                  const Text('Helpline Status:',
+                      style: TextStyle(fontSize: 12.0)),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: status == '1',
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == true) {
+                              status = '1'; // Set to Active
+                            } else {
+                              status = ''; // Uncheck both
+                            }
+                          });
+                        },
+                      ),
+                      const Text('Active'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: status == '0',
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == true) {
+                              status = '0'; // Set to Inactive
+                            } else {
+                              status = ''; // Uncheck both
+                            }
+                          });
+                        },
+                      ),
+                      const Text('Inactive'),
+                    ],
+                  ),
+                ],
+              ),
             ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Update'),
+                onPressed: () {
+                  // Update the helpline with the new values
+                  helpline.name = provider.nameController.text;
+                  helpline.address = provider.addressController.text;
+                  helpline.status = status; // Update the status
+                  provider.updateHelpline(
+                      helpline, status); // Call provider update method
+
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Update'),
-              onPressed: () {
-                // Call the provider update method
-                // final provider =
-                //     Provider.of<EmergencyProvider>(context, listen: false);
-                // provider.updateHelpline(helpline); // Update the helpline
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
@@ -164,17 +182,18 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                               headerColor: appTheme.deepOrangeA100,
                               gridLineColor: appTheme.pink300),
                           child: SfDataGrid(
+                            allowFiltering: true,
                             source: HelplineDataSource(
                               helplines: provider.model.dBDATA!,
-                              onUpdate: (helpline) =>
-                                  _showUpdateHelplinePopup(context, helpline),
+                              onUpdate: (helpline) => _showUpdateHelplinePopup(
+                                  context, helpline, provider),
                               onDelete: (helpline) =>
                                   _showDeleteConfirmationDialog(
                                       context, helpline, provider),
                             ),
                             gridLinesVisibility: GridLinesVisibility.both,
                             headerGridLinesVisibility: GridLinesVisibility.both,
-                            columnWidthMode: ColumnWidthMode.fitByCellValue,
+                            columnWidthMode: ColumnWidthMode.auto,
                             columns: <GridColumn>[
                               GridColumn(
                                 columnName: 'no',
@@ -201,10 +220,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                 label: const Center(child: Text('Status')),
                               ),
                               GridColumn(
-                                columnName: 'entryTime',
-                                label: const Center(child: Text('Entry Time')),
-                              ),
-                              GridColumn(
+                                allowFiltering: false,
                                 columnName: 'actions',
                                 label: const Center(child: Text('Actions')),
                               ),
@@ -242,26 +258,9 @@ class HelplineDataSource extends DataGridSource {
                   columnName: 'phone', value: helpline.phone ?? ''),
               DataGridCell<String>(
                   columnName: 'address', value: helpline.address ?? ''),
-              DataGridCell<Widget>(
-                  columnName: 'status',
-                  value: FlutterSwitch(
-                    width: 55.0,
-                    height: 25.0,
-                    valueFontSize: 12.0,
-                    toggleSize: 18.0,
-                    value: helpline.status == '1',
-                    borderRadius: 20.0,
-                    padding: 2.0,
-                    showOnOff: true,
-                    onToggle: (val) {
-                      // You can handle status update here
-                    },
-                  )),
               DataGridCell<String>(
-                  columnName: 'entryTime',
-                  value: DateFormat('MM/dd/yyyy HH:mm').format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          helpline.entryTime ?? 0))),
+                  columnName: 'status',
+                  value: helpline.status == '1' ? 'Active' : 'Inactive'),
               DataGridCell<Widget>(
                   columnName: 'actions',
                   value: PopupMenuButton<String>(
@@ -300,9 +299,20 @@ class HelplineDataSource extends DataGridSource {
       Center(child: Text(row.getCells()[2].value.toString())),
       Center(child: Text(row.getCells()[3].value.toString())),
       Center(child: Text(row.getCells()[4].value.toString())),
-      Center(child: row.getCells()[5].value),
-      Center(child: Text(row.getCells()[6].value.toString())),
-      Center(child: row.getCells()[7].value),
+      SizedBox(
+        height: 10.v,
+        width: 10.h,
+        child: Card(
+          color: row.getCells()[5].value.toString() == 'Active'
+              ? Colors.lightGreen
+              : Colors.red.withOpacity(.5),
+          child: Center(
+              child: Text(row.getCells()[5].value.toString() == 'Active'
+                  ? 'Active'
+                  : 'Inactive')),
+        ),
+      ),
+      Center(child: row.getCells()[6].value),
     ]);
   }
 }

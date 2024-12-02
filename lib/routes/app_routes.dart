@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyrebox/presentation/rigister_screen/register_org_screen.dart';
 import 'package:fyrebox/presentation/rigister_screen/rigister_screen.dart';
 import 'package:fyrebox/presentation/setting/change_password/change_password.dart';
 import 'package:fyrebox/presentation/setting/profile/profile_screen.dart';
@@ -27,6 +28,8 @@ class AppRoutes {
   static const String splashScreen = '/splash_screen';
   // static const String loginScreenDarkScreen = '/login_screen_dark_screen';
   static const String loginScreen = '/login_screen';
+  static const String registerOrganizationScreen =
+      '/registerOrganizationScreen';
   static const String signUpScreen = '/signUp_Screen';
   static const String privacyScreen = '/privacy_screen';
   static const String addOrgScreen = '/addOrgScreen';
@@ -50,12 +53,13 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> get routes => {
         orderDeviceScreen: OrderDeviceScreen.builder,
+        registerOrganizationScreen: RegisterOrganizationScreen.builder,
         organizationScreen: OrganizationScreen.builder,
         addOrgScreen: AddOrganizationUserScreen.builder,
         addVisitorScreen: AddVisitorScreen.builder,
         addHelplineScreen: AddHelplineScreen.builder,
         contactInfoScreen: ContactInfoScreen.builder,
-        changePasswordScreen: ChangePasswordScreen().builder,
+        changePasswordScreen: const ChangePasswordScreen().builder,
         addDeviceScreen: AddDeviceScreen.builder,
         settingScreen: const ProfileScreen().builder,
         alertscreen: const AlertScreen().builder,

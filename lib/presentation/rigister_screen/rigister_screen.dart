@@ -1,3 +1,5 @@
+import 'package:fyrebox/presentation/rigister_screen/register_org_screen.dart';
+
 import '../../core/app_export.dart';
 import '../../core/utils/validation_functions.dart';
 import '../../widgets/custom_text_form_field.dart';
@@ -294,7 +296,10 @@ class RigisterScreenState extends State<RigisterScreen> {
               SizedBox(height: 24.h),
               GestureDetector(
                 onTap: () {
-                  registerUser(context);
+                  // registerUser(context);
+                  NavigatorService.pushNamed(
+                    AppRoutes.registerOrganizationScreen,
+                  );
                 },
                 child: SizedBox(
                   height: 40.h,
@@ -354,7 +359,7 @@ class RigisterScreenState extends State<RigisterScreen> {
 
   void _onLoginDeviceAuthEventSuccess(BuildContext context) {
     NavigatorService.pushNamed(
-      AppRoutes.rootScreen,
+      AppRoutes.registerOrganizationScreen,
     );
   }
 

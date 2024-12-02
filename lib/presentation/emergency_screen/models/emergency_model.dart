@@ -24,7 +24,7 @@ class EmergencyModel {
     ),
     SelectionPopupModel(
       id: 1,
-      title: "Agent",
+      title: "Artisan",
       isSelected: true,
     ),
   ];

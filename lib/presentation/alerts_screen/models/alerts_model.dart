@@ -16,6 +16,10 @@ class AlertsModel {
       id: 2,
       title: "In-Active",
     ),
+    SelectionPopupModel(
+      id: 3,
+      title: "Archive",
+    ),
   ];
   List<SelectionPopupModel> deviceTypeDropdownItemList = [
     SelectionPopupModel(
@@ -24,7 +28,7 @@ class AlertsModel {
     ),
     SelectionPopupModel(
       id: 1,
-      title: "Agent",
+      title: "Artisan",
       isSelected: true,
     ),
   ];

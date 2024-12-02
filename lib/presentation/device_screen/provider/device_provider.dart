@@ -1,21 +1,22 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:fyrebox/core/utils/progress_dialog_utils.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:fyrebox/data/models/device_type.dart';
+import 'package:fyrebox/data/models/selectionPopupModel/selection_popup_model.dart';
 
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/shared_prf.dart';
 import '../../../data/models/device_model.dart';
 import '../../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
-import '../../../data/models/user_data_model.dart';
 import '../../../data/repository/repository.dart';
 import '../models/device_model.dart';
 
 class DeviceProvider extends ChangeNotifier {
   DeviceModel deviceModelObj = DeviceModel();
-
+  DeviceTypeResponse model1 = DeviceTypeResponse();
   DeviceResponse model = DeviceResponse();
   final _repository = Repository();
   LocalStorageService sp = LocalStorageService();
@@ -24,6 +25,7 @@ class DeviceProvider extends ChangeNotifier {
   final TextEditingController quantityController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController deviceNameController = TextEditingController();
+  final TextEditingController deviceSiteController = TextEditingController();
   final TextEditingController siteNameController = TextEditingController();
   final TextEditingController deviceLocationController =
       TextEditingController();
@@ -55,34 +57,86 @@ class DeviceProvider extends ChangeNotifier {
     await loadDashboardData();
   }
 
-  void downloadFile() async {
-    // Create an instance of Dio
+  void downloadPreviousFile(BuildContext context, String id) async {
     var token = PrefUtils().getAccessToken();
     Dio dio = Dio();
 
-    // URL for file download
-    String url =
-        'https://fyreboxhub.com/api/export_device_checklists.php?access_token=$token';
-    print(
-        'https://fyreboxhub.com/api/export_device_checklists.php?access_token=$token');
-    // Get the directory to save the downloaded file
-    Directory directory = await getApplicationDocumentsDirectory();
-    String filePath = '${directory.path}/export_device_checklists.csv';
+    try {
+      // URL for file download
+      String url =
+          'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&previous=true&access_token=$token';
+      print('Download URL: $url');
+
+      // Directory for saving the file
+      String savedDir = Directory('/storage/emulated/0/Download').path;
+
+      // Enqueue download task
+      final taskId = await FlutterDownloader.enqueue(
+        url: url,
+        headers: {}, // optional: add headers if needed
+        savedDir: savedDir,
+        showNotification: true, // show download progress in status bar
+        openFileFromNotification: true, // allow opening file from notification
+      );
+
+      if (taskId != null) {
+        print('Download started with taskId: $taskId');
+        FlutterDownloader.open(taskId: taskId);
+        showSuccess('File successfully downloaded');
+      } else {
+        showError('Failed to start the download. Please try again.');
+      }
+    } catch (error) {
+      if (error is DioException) {
+        // Handle Dio-specific errors
+        showError(
+            'Network error: ${error.message}. Please check your connection.');
+      } else {
+        // Handle generic errors
+        showError('Error downloading file: $error');
+      }
+      print('DownloadPreviousFile Error: $error');
+    }
+  }
+
+  void downloadFile(BuildContext context, String id) async {
+    var token = PrefUtils().getAccessToken();
+    Dio dio = Dio();
 
     try {
-      // Download the file
-      ProgressDialogUtils.showProgressDialog();
-      await dio.download(url, filePath, onReceiveProgress: (received, total) {
-        if (total != -1) {
-          print("${(received / total * 100).toStringAsFixed(0)}%");
-        }
-      });
-      ProgressDialogUtils.hideProgressDialog();
-      print("Download completed! File saved at $filePath");
-      showSuccess("Download completed! File saved at $filePath");
-    } catch (e) {
-      print("Error: $e");
-      showError("Error: $e");
+      // URL for file download
+      String url =
+          'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&access_token=$token';
+      print('Download URL: $url');
+
+      // Directory for saving the file
+      String savedDir = Directory('/storage/emulated/0/Download').path;
+
+      // Enqueue download task
+      final taskId = await FlutterDownloader.enqueue(
+        url: url,
+        headers: {}, // optional: add headers if needed
+        savedDir: savedDir,
+        showNotification: true, // show download progress in status bar
+        openFileFromNotification: true, // allow opening file from notification
+      );
+
+      if (taskId != null) {
+        print('Download started with taskId: $taskId');
+        showSuccess('File successfully downloaded');
+      } else {
+        showError('Failed to start the download. Please try again.');
+      }
+    } catch (error) {
+      if (error is DioException) {
+        // Handle Dio-specific errors
+        showError(
+            'Network error: ${error.message}. Please check your connection.');
+      } else {
+        // Handle generic errors
+        showError('Error downloading file: $error');
+      }
+      print('DownloadFile Error: $error');
     }
   }
 
@@ -119,6 +173,7 @@ class DeviceProvider extends ChangeNotifier {
 
   FutureOr<void> addDevice() async {
     USERDATA userdata = prefUtils.getUserData()!;
+
     await _repository.addDevice(
       formData: {
         'org_id': userdata.orgId,
@@ -170,11 +225,11 @@ class DeviceProvider extends ChangeNotifier {
   }
 
   Future<void> updateDevice(String deviceId) async {
-    USERDATA userdata = prefUtils.getUserData()!;
     await _repository.addDevice(
       formData: {
-        'operation':
-            'update_device', // Assuming the backend operation is called 'update_device'
+        'operation': 'update_device',
+        'device_name': deviceNameController.text,
+        'device_cite_name': deviceSiteController.text,
         'device_id': deviceId,
         'device_type': deviceTypeController.text,
         'device_location': deviceLocationController.text,
@@ -183,7 +238,7 @@ class DeviceProvider extends ChangeNotifier {
       if (value.sTATUS != "ERROR") {
         showSuccess('Device updated successfully');
         // Fetch updated device data
-        await loadDashboardData();
+        // await loadDashboardData();
         notifyListeners();
       } else {
         showError(value.eRRORDESCRIPTION ?? 'Failed to update device');
@@ -240,6 +295,7 @@ class DeviceProvider extends ChangeNotifier {
     ).then((value) async {
       model = value;
       if (model.status != "ERROR") {
+        await loadDeviceTypedData();
         notifyListeners();
       } else {
         showError(model.errorDescription ?? '');
@@ -353,5 +409,44 @@ class DeviceProvider extends ChangeNotifier {
     }
     deviceModelObj.actionsItemList[index].isSelected = value;
     notifyListeners();
+  }
+
+  FutureOr<void> loadDeviceTypedData({
+    Function? onSuccess,
+    Function? onError,
+  }) async {
+    await _repository.deviceType(
+      formData: {
+        'operation': 'get_device_types',
+      },
+    ).then((value) async {
+      model1 = value;
+      if (model1.sTATUS != "ERROR") {
+        // Parse data into deviceTypeDropdownItemList
+        deviceModelObj.deviceTypeDropdownItemList = model1.dBDATA
+                ?.map((data) => SelectionPopupModel(
+                      id: data.id,
+                      title: data.deviceTypeName ?? "",
+                    ))
+                .toList() ??
+            [];
+        deviceModelObj.orderdeviceTypeDropdownItemList = model1.dBDATA
+                ?.map((data) => SelectionPopupModel(
+                      id: data.id,
+                      title: data.deviceTypeName ?? "",
+                    ))
+                .toList() ??
+            [];
+        notifyListeners();
+        if (onSuccess != null) {
+          onSuccess();
+        }
+      } else {
+        showError(model.errorDescription ?? '');
+        if (onError != null) {
+          onError(model.errorDescription ?? '');
+        }
+      }
+    });
   }
 }
