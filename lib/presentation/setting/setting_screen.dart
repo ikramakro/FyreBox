@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:fyrebox/core/app_export.dart';
-
-import '../../data/models/loginDeviceAuth/post_login_device_auth_resp.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -42,16 +39,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showDeleteConfirmationDialog(context);
             },
           ),
-          // const Divider(),
-          // ListTile(
-          //   leading: const Icon(Icons.contact_mail),
-          //   title: const Text('Contact Info'),
-          //   onTap: () {
-          //     // Handle tap for Contact Info
-          //     NavigatorService.pushNamed(AppRoutes.contactInfoScreen);
-          //     // _showContactInfoDialog(context);
-          //   },
-          // ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.contact_mail),
+            title: const Text('Organization'),
+            onTap: () {
+              // Handle tap for Contact Info
+              NavigatorService.pushNamed(AppRoutes.organizationNameScreen);
+              // _showContactInfoDialog(context);
+            },
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.image),

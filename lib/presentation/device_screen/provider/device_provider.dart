@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -60,45 +61,135 @@ class DeviceProvider extends ChangeNotifier {
   void downloadPreviousFile(BuildContext context, String id) async {
     var token = PrefUtils().getAccessToken();
     Dio dio = Dio();
+    String url =
+        'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&json=false&previous=true&access_token=$token';
+    print('Download URL: $url');
 
     try {
-      // URL for file download
-      String url =
-          'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&previous=true&access_token=$token';
-      print('Download URL: $url');
+      // Fetch API response
+      final response = await dio.get(url);
 
-      // Directory for saving the file
-      String savedDir = Directory('/storage/emulated/0/Download').path;
+      try {
+        // Attempt to parse the response as JSON
+        Map<String, dynamic> data = jsonDecode(response.data);
 
-      // Enqueue download task
-      final taskId = await FlutterDownloader.enqueue(
-        url: url,
-        headers: {}, // optional: add headers if needed
-        savedDir: savedDir,
-        showNotification: true, // show download progress in status bar
-        openFileFromNotification: true, // allow opening file from notification
-      );
+        // Check for API error status
+        if (data['STATUS'] == 'ERROR') {
+          String errorDescription =
+              data['ERROR_DESCRIPTION'] ?? 'Unknown error occurred';
+          showError(errorDescription);
+          return;
+        }
+      } on FormatException {
+        // Handle non-JSON response (likely a file download)
 
-      if (taskId != null) {
-        print('Download started with taskId: $taskId');
-        FlutterDownloader.open(taskId: taskId);
-        showSuccess('File successfully downloaded');
-      } else {
-        showError('Failed to start the download. Please try again.');
+        // Directory for saving the file
+        String savedDir = Directory('/storage/emulated/0/Download').path;
+
+        // Enqueue download task
+        final taskId = await FlutterDownloader.enqueue(
+          url: url,
+          headers: {}, // optional: add headers if needed
+          savedDir: savedDir,
+          showNotification: true, // show download progress in status bar
+          openFileFromNotification:
+              true, // allow opening file from notification
+        );
+
+        if (taskId != null) {
+          print('Download started with taskId: $taskId');
+          showSuccess('File successfully downloaded');
+        } else {
+          showError('Failed to start the download. Please try again.');
+        }
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
       if (error is DioException) {
         // Handle Dio-specific errors
         showError(
             'Network error: ${error.message}. Please check your connection.');
       } else {
-        // Handle generic errors
+        // Handle other generic errors
         showError('Error downloading file: $error');
       }
-      print('DownloadPreviousFile Error: $error');
+      print('DownloadFile Error: $error $stackTrace');
     }
   }
 
+  // void downloadPreviousFile(BuildContext context, String id) async {
+  //   var token = PrefUtils().getAccessToken();
+  //   Dio dio = Dio();
+  //   try {
+  //     // URL for file download
+  //     String url =
+  //         'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&previous=true&access_token=$token';
+  //     print('Download URL: $url');
+  //     // Directory for saving the file
+  //     String savedDir = Directory('/storage/emulated/0/Download').path;
+  //     // Enqueue download task
+  //     final taskId = await FlutterDownloader.enqueue(
+  //       url: url,
+  //       headers: {}, // optional: add headers if needed
+  //       savedDir: savedDir,
+  //       showNotification: true, // show download progress in status bar
+  //       openFileFromNotification: true, // allow opening file from notification
+  //     );
+  //     if (taskId != null) {
+  //       print('Download started with taskId: $taskId');
+  //       FlutterDownloader.open(taskId: taskId);
+  //       showSuccess('File successfully downloaded');
+  //     } else {
+  //       showError('Failed to start the download. Please try again.');
+  //     }
+  //   } catch (error) {
+  //     if (error is DioException) {
+  //       // Handle Dio-specific errors
+  //       showError(
+  //           'Network error: ${error.message}. Please check your connection.');
+  //     } else {
+  //       // Handle generic errors
+  //       showError('Error downloading file: $error');
+  //     }
+  //     print('DownloadPreviousFile Error: $error');
+  //   }
+  // }
+
+  // void downloadFile(BuildContext context, String id) async {
+  //   var token = PrefUtils().getAccessToken();
+  //   Dio dio = Dio();
+  //   try {
+  //     // URL for file download
+  //     String url =
+  //         'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&json=false&access_token=$token';
+  //     print('Download URL: $url');
+  //     // Directory for saving the file
+  //     String savedDir = Directory('/storage/emulated/0/Download').path;
+  //     // Enqueue download task
+  //     final taskId = await FlutterDownloader.enqueue(
+  //       url: url,
+  //       headers: {}, // optional: add headers if needed
+  //       savedDir: savedDir,
+  //       showNotification: true, // show download progress in status bar
+  //       openFileFromNotification: true, // allow opening file from notification
+  //     );
+  //     if (taskId != null) {
+  //       print('Download started with taskId: $taskId');
+  //       showSuccess('File successfully downloaded');
+  //     } else {
+  //       showError('Failed to start the download. Please try again.');
+  //     }
+  //   } catch (error) {
+  //     if (error is DioException) {
+  //       // Handle Dio-specific errors
+  //       showError(
+  //           'Network error: ${error.message}. Please check your connection.');
+  //     } else {
+  //       // Handle generic errors
+  //       showError('Error downloading file: $error');
+  //     }
+  //     print('DownloadFile Error: $error');
+  //   }
+  // }
   void downloadFile(BuildContext context, String id) async {
     var token = PrefUtils().getAccessToken();
     Dio dio = Dio();
@@ -106,37 +197,56 @@ class DeviceProvider extends ChangeNotifier {
     try {
       // URL for file download
       String url =
-          'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&access_token=$token';
+          'https://fyreboxhub.com/api/export_device_checklists.php?device_id=$id&json=false&access_token=$token';
       print('Download URL: $url');
 
-      // Directory for saving the file
-      String savedDir = Directory('/storage/emulated/0/Download').path;
+      // Fetch API response
+      final response = await dio.get(url);
 
-      // Enqueue download task
-      final taskId = await FlutterDownloader.enqueue(
-        url: url,
-        headers: {}, // optional: add headers if needed
-        savedDir: savedDir,
-        showNotification: true, // show download progress in status bar
-        openFileFromNotification: true, // allow opening file from notification
-      );
+      try {
+        // Attempt to parse the response as JSON
+        Map<String, dynamic> data = jsonDecode(response.data);
 
-      if (taskId != null) {
-        print('Download started with taskId: $taskId');
-        showSuccess('File successfully downloaded');
-      } else {
-        showError('Failed to start the download. Please try again.');
+        // Check for API error status
+        if (data['STATUS'] == 'ERROR') {
+          String errorDescription =
+              data['ERROR_DESCRIPTION'] ?? 'Unknown error occurred';
+          showError(errorDescription);
+          return;
+        }
+      } on FormatException {
+        // Handle non-JSON response (likely a file download)
+
+        // Directory for saving the file
+        String savedDir = Directory('/storage/emulated/0/Download').path;
+
+        // Enqueue download task
+        final taskId = await FlutterDownloader.enqueue(
+          url: url,
+          headers: {}, // optional: add headers if needed
+          savedDir: savedDir,
+          showNotification: true, // show download progress in status bar
+          openFileFromNotification:
+              true, // allow opening file from notification
+        );
+
+        if (taskId != null) {
+          print('Download started with taskId: $taskId');
+          showSuccess('File successfully downloaded');
+        } else {
+          showError('Failed to start the download. Please try again.');
+        }
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
       if (error is DioException) {
         // Handle Dio-specific errors
         showError(
             'Network error: ${error.message}. Please check your connection.');
       } else {
-        // Handle generic errors
+        // Handle other generic errors
         showError('Error downloading file: $error');
       }
-      print('DownloadFile Error: $error');
+      print('DownloadFile Error: $error $stackTrace');
     }
   }
 

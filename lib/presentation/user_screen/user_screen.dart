@@ -327,6 +327,7 @@ class UserScreenState extends State<UserScreen> {
                                     columnName: 'role',
                                     label: const Center(child: Text('Role'))),
                                 GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'status',
                                     label: const Center(child: Text('Status'))),
                                 GridColumn(

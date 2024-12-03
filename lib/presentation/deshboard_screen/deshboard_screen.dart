@@ -78,10 +78,10 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   Widget _buildTodaySalesSummary(BuildContext context) {
     return Container(
       width: double.maxFinite,
-      margin: EdgeInsets.only(right: 4.h),
+      // margin: EdgeInsets.only(right: 4.h),
       padding: EdgeInsets.symmetric(
-        horizontal: 30.h,
-        vertical: 22.h,
+        horizontal: 15.h,
+        vertical: 15.h,
       ),
       decoration: AppDecoration.outlineGray.copyWith(
         borderRadius: BorderRadiusStyle.roundedBorder20,
@@ -117,9 +117,9 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 appTheme.purple50
               ];
               List color = [
-                Colors.blue,
-                Colors.purple,
-                Colors.green,
+                const Color.fromARGB(255, 16, 78, 129),
+                const Color.fromARGB(255, 106, 19, 122),
+                const Color.fromARGB(255, 21, 78, 22),
               ];
               List navigator = [
                 3,
@@ -131,8 +131,8 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 20.h,
-                  mainAxisSpacing: 20.h,
+                  crossAxisSpacing: 5.h,
+                  mainAxisSpacing: 10.h,
                   childAspectRatio: 2 / 2.5,
                 ),
                 itemCount: 3,
@@ -156,28 +156,25 @@ class _DeshboardScreenState extends State<DeshboardScreen> {
   Widget _buildStatCard(
       String title, String count, Color color, String percentage) {
     return Card(
-      color: color.withOpacity(0.1),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              style: TextStyle(fontSize: 16.0, color: color),
-            ),
-            Text(
-              count,
-              style: TextStyle(
-                  fontSize: 28.0, fontWeight: FontWeight.bold, color: color),
-            ),
-            Text(
-              percentage,
-              style: TextStyle(fontSize: 16.0, color: color),
-            ),
-          ],
-        ),
+      color: color.withOpacity(0.2),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontSize: 16.0, color: color),
+          ),
+          Text(
+            count,
+            style: TextStyle(
+                fontSize: 28.0, fontWeight: FontWeight.bold, color: color),
+          ),
+          // Text(
+          //   percentage,
+          //   style: TextStyle(fontSize: 16.0, color: color),
+          // ),
+        ],
       ),
     );
   }

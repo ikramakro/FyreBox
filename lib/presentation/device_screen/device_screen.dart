@@ -416,76 +416,79 @@ class DeviceScreenState extends State<DeviceScreen> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: SfDataGridTheme(
-                            data: SfDataGridThemeData(
-                                headerColor: appTheme.deepOrangeA100,
-                                gridLineColor: appTheme.pink300),
-                            child: SfDataGrid(
-                              allowFiltering: true,
-                              source: DeviceDataSource(
-                                devices: provider.model.dbData ?? [],
-                                onDelete: (device) =>
-                                    _showDeleteConfirmationDialog(
-                                        context, device, provider),
-                                onView: (device) =>
-                                    _showDeviceDetailsBottomSheet(
-                                        context, device),
-                                onUpdate: (device) => _showUpdateDeviceDialog(
-                                    context, device, provider),
-                                onLatestReport: (device) =>
-                                    provider.downloadFile(
-                                  context,
-                                  device.id.toString(),
+                              data: SfDataGridThemeData(
+                                  headerColor: appTheme.deepOrangeA100,
+                                  gridLineColor: appTheme.pink300),
+                              child: SfDataGrid(
+                                allowFiltering: true,
+                                source: DeviceDataSource(
+                                  devices: provider.model.dbData ?? [],
+                                  onDelete: (device) =>
+                                      _showDeleteConfirmationDialog(
+                                          context, device, provider),
+                                  onView: (device) =>
+                                      _showDeviceDetailsBottomSheet(
+                                          context, device),
+                                  onUpdate: (device) => _showUpdateDeviceDialog(
+                                      context, device, provider),
+                                  onLatestReport: (device) =>
+                                      provider.downloadFile(
+                                          context, device.id.toString()),
+                                  onPreviousReports: (device) =>
+                                      provider.downloadPreviousFile(
+                                          context, device.id.toString()),
                                 ),
-                                onPreviousReports: (device) =>
-                                    provider.downloadPreviousFile(
-                                  context,
-                                  device.id.toString(),
-                                ),
-                              ),
-                              gridLinesVisibility: GridLinesVisibility.both,
-                              headerGridLinesVisibility:
-                                  GridLinesVisibility.both,
-                              columnWidthMode: ColumnWidthMode.auto,
-                              onQueryRowHeight: (details) {
-                                return 30;
-                              },
-                              columns: <GridColumn>[
-                                GridColumn(
-                                  columnName: 'no',
-                                  label: const Center(child: Text('No')),
-                                ),
-                                GridColumn(
-                                    columnName: 'name',
-                                    label: const Center(
-                                        child: Text('Device Name'))),
-                                GridColumn(
-                                    columnName: 'sitename',
-                                    label:
-                                        const Center(child: Text('Site Name'))),
-                                GridColumn(
+                                gridLinesVisibility: GridLinesVisibility.both,
+                                headerGridLinesVisibility:
+                                    GridLinesVisibility.both,
+                                columnWidthMode: ColumnWidthMode.auto,
+                                onQueryRowHeight: (details) {
+                                  return 30;
+                                },
+                                columns: <GridColumn>[
+                                  GridColumn(
                                     allowFiltering: false,
-                                    columnName: 'devicekey',
-                                    label: const Center(
-                                        child: Text('Device Key'))),
-                                GridColumn(
+                                    columnName: 'no',
+                                    label: const Center(child: Text('No')),
+                                  ),
+                                  GridColumn(
                                     columnName: 'devicetype',
                                     label: const Center(
-                                        child: Text('Device Type'))),
-                                GridColumn(
+                                        child: Text('Device Type')),
+                                  ),
+                                  GridColumn(
+                                    columnName: 'sitename',
+                                    label:
+                                        const Center(child: Text('Site Name')),
+                                  ),
+                                  GridColumn(
+                                    columnName: 'devicename',
+                                    label: const Center(
+                                        child: Text('Device Name')),
+                                  ),
+                                  GridColumn(
                                     columnName: 'location',
                                     label:
-                                        const Center(child: Text('Location'))),
-                                GridColumn(
+                                        const Center(child: Text('Location')),
+                                  ),
+                                  GridColumn(
+                                    allowFiltering: false,
+                                    columnName: 'devicekey',
+                                    label:
+                                        const Center(child: Text('Device Key')),
+                                  ),
+                                  GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'status',
-                                    label: const Center(child: Text('Status'))),
-                                GridColumn(
+                                    label: const Center(child: Text('Status')),
+                                  ),
+                                  GridColumn(
                                     allowFiltering: false,
                                     columnName: 'actions',
-                                    label:
-                                        const Center(child: Text('Actions'))),
-                              ],
-                            ),
-                          ),
+                                    label: const Center(child: Text('Actions')),
+                                  ),
+                                ],
+                              )),
                         ),
                       );
                     }),

@@ -143,6 +143,8 @@ class VistorScreenState extends State<VistorScreen> {
       BuildContext context, DBDATA visitor, VisitorProvider provider) {
     TextEditingController namecontr =
         TextEditingController(text: visitor.visitorName);
+    TextEditingController phonecontr =
+        TextEditingController(text: visitor.visitorPhone);
     String visitorStatus = visitor.status!;
     showDialog(
       context: context,
@@ -158,6 +160,12 @@ class VistorScreenState extends State<VistorScreen> {
                 CustomTextFormField1(
                   controller: namecontr,
                   hintText: visitor.visitorName,
+                ),
+                const SizedBox(height: 16.0),
+                const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
+                CustomTextFormField1(
+                  controller: phonecontr,
+                  hintText: visitor.visitorPhone,
                 ),
                 const SizedBox(height: 16.0),
                 const Text('Visitor Status:', style: TextStyle(fontSize: 12.0)),
@@ -196,11 +204,13 @@ class VistorScreenState extends State<VistorScreen> {
               TextButton(
                 child: const Text('Update'),
                 onPressed: () {
+                  print(phonecontr.text);
                   provider.updateVisitorData(
-                    id: visitor.id.toString(),
-                    visitor_name: namecontr.text,
-                    visitor_status: visitorStatus,
-                  );
+                      id: visitor.id.toString(),
+                      visitorName: namecontr.text,
+                      visitorStatus: visitorStatus,
+                      visitorPhone: phonecontr.text,
+                      alphaid: visitor.visitoralphaid.toString());
                   Navigator.of(context).pop();
                 },
               ),
@@ -350,13 +360,17 @@ class VistorScreenState extends State<VistorScreen> {
                             child: SfDataGrid(
                               allowFiltering: true,
                               source: VisitorDataSource(
-                                visitors: provider.model.dBDATA ?? [],
-                                onUpdate: (visitor) => _showUpdateVisitorPopup(
-                                    context, visitor, provider),
-                                onDelete: (visitor) =>
-                                    _showDeleteConfirmationDialog(
-                                        context, visitor, provider),
-                              ),
+                                  visitors: provider.model.dBDATA ?? [],
+                                  onUpdate: (visitor) =>
+                                      _showUpdateVisitorPopup(
+                                          context, visitor, provider),
+                                  onDelete: (visitor) =>
+                                      _showDeleteConfirmationDialog(
+                                          context, visitor, provider),
+                                  onArrchive: (visitor) =>
+                                      provider.archivealert(
+                                          visitor.id.toString(),
+                                          visitor.visitoralphaid.toString())),
                               gridLinesVisibility: GridLinesVisibility.both,
                               headerGridLinesVisibility:
                                   GridLinesVisibility.both,
@@ -374,10 +388,15 @@ class VistorScreenState extends State<VistorScreen> {
                                     label: const Center(
                                         child: Text('Visitor Name'))),
                                 GridColumn(
+                                    columnName: 'visitorId',
+                                    label: const Center(
+                                        child: Text('Visitor ID'))),
+                                GridColumn(
                                     columnName: 'visitorPhone',
                                     label: const Center(
                                         child: Text('Visitor Phone'))),
                                 GridColumn(
+                                    allowFiltering: false,
                                     columnName: 'status',
                                     label: const Center(child: Text('Status'))),
                                 GridColumn(
@@ -435,13 +454,16 @@ class VisitorDataSource extends DataGridSource {
   VisitorDataSource(
       {required List<DBDATA> visitors,
       required this.onUpdate,
-      required this.onDelete}) {
+      required this.onDelete,
+      required this.onArrchive}) {
     int counter = 1;
     _visitors = visitors.map<DataGridRow>((visitor) {
       final row = DataGridRow(cells: [
         DataGridCell<String>(columnName: 'no', value: counter.toString()),
         DataGridCell<String>(
             columnName: 'visitorName', value: visitor.visitorName),
+        DataGridCell<String>(
+            columnName: 'visitorId', value: visitor.id.toString()),
         DataGridCell<String>(
             columnName: 'visitorPhone', value: visitor.visitorPhone),
         DataGridCell<String>(
@@ -457,10 +479,12 @@ class VisitorDataSource extends DataGridSource {
                   onUpdate(visitor);
                 } else if (value == 'Delete') {
                   onDelete(visitor);
+                } else if (value == 'Archive') {
+                  onArrchive(visitor);
                 }
               },
               itemBuilder: (BuildContext context) {
-                return {'Update', 'Delete'}.map((String choice) {
+                return {'Update', 'Delete', 'Archive'}.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(choice),
@@ -477,6 +501,7 @@ class VisitorDataSource extends DataGridSource {
   List<DataGridRow> _visitors = [];
   final Function(DBDATA) onUpdate;
   final Function(DBDATA) onDelete;
+  final Function(DBDATA) onArrchive;
 
   @override
   List<DataGridRow> get rows => _visitors;
@@ -487,17 +512,18 @@ class VisitorDataSource extends DataGridSource {
       Center(child: Text(row.getCells()[0].value.toString())),
       Center(child: Text(row.getCells()[1].value.toString())),
       Center(child: Text(row.getCells()[2].value.toString())),
+      Center(child: Text(row.getCells()[3].value.toString())),
       Center(
           child: Card(
-        color: row.getCells()[3].value == 'Active'
+        color: row.getCells()[4].value == 'Active'
             ? Colors.lightGreen
             : Colors.red.withOpacity(.5),
         child: Center(
             child: Text(
-                row.getCells()[3].value == 'Active' ? 'Active' : 'Inactive')),
+                row.getCells()[4].value == 'Active' ? 'Active' : 'Inactive')),
       )),
-      Center(child: Text(row.getCells()[4].value.toString())),
-      Center(child: row.getCells()[5].value),
+      Center(child: Text(row.getCells()[5].value.toString())),
+      Center(child: row.getCells()[6].value),
     ]);
   }
 }

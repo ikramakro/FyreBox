@@ -56,36 +56,40 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       style: TextStyle(fontSize: 12.0)),
                   Row(
                     children: [
-                      Checkbox(
-                        value: status == '1',
-                        onChanged: (value) {
-                          setState(() {
-                            if (value == true) {
-                              status = '1'; // Set to Active
-                            } else {
-                              status = ''; // Uncheck both
-                            }
-                          });
-                        },
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: status == '1',
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  status = '1'; // Set to Active
+                                } else {
+                                  status = ''; // Uncheck both
+                                }
+                              });
+                            },
+                          ),
+                          const Text('Active'),
+                        ],
                       ),
-                      const Text('Active'),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: status == '0',
-                        onChanged: (value) {
-                          setState(() {
-                            if (value == true) {
-                              status = '0'; // Set to Inactive
-                            } else {
-                              status = ''; // Uncheck both
-                            }
-                          });
-                        },
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: status == '0',
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  status = '0'; // Set to Inactive
+                                } else {
+                                  status = ''; // Uncheck both
+                                }
+                              });
+                            },
+                          ),
+                          const Text('Inactive'),
+                        ],
                       ),
-                      const Text('Inactive'),
                     ],
                   ),
                 ],
@@ -194,6 +198,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                             gridLinesVisibility: GridLinesVisibility.both,
                             headerGridLinesVisibility: GridLinesVisibility.both,
                             columnWidthMode: ColumnWidthMode.auto,
+                            onQueryRowHeight: (details) {
+                              return 30;
+                            },
                             columns: <GridColumn>[
                               GridColumn(
                                 columnName: 'no',
@@ -216,6 +223,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                 label: const Center(child: Text('Address')),
                               ),
                               GridColumn(
+                                allowFiltering: false,
                                 columnName: 'status',
                                 label: const Center(child: Text('Status')),
                               ),
@@ -246,42 +254,44 @@ class HelplineDataSource extends DataGridSource {
     required this.onUpdate,
     required this.onDelete,
   }) {
-    _helplines = helplines
-        .map<DataGridRow>((helpline) => DataGridRow(cells: [
-              DataGridCell<String>(
-                  columnName: 'no', value: helpline.id.toString()),
-              DataGridCell<String>(
-                  columnName: 'name', value: helpline.name ?? ''),
-              DataGridCell<String>(
-                  columnName: 'type', value: helpline.type ?? ''),
-              DataGridCell<String>(
-                  columnName: 'phone', value: helpline.phone ?? ''),
-              DataGridCell<String>(
-                  columnName: 'address', value: helpline.address ?? ''),
-              DataGridCell<String>(
-                  columnName: 'status',
-                  value: helpline.status == '1' ? 'Active' : 'Inactive'),
-              DataGridCell<Widget>(
-                  columnName: 'actions',
-                  value: PopupMenuButton<String>(
-                    onSelected: (String value) {
-                      if (value == 'Update') {
-                        onUpdate(helpline);
-                      } else if (value == 'Delete') {
-                        onDelete(helpline);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'Update', 'Delete'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  )),
-            ]))
-        .toList();
+    int counter = 1;
+    _helplines = helplines.map<DataGridRow>((helpline) {
+      final row = DataGridRow(
+        cells: [
+          DataGridCell<String>(columnName: 'no', value: counter.toString()),
+          DataGridCell<String>(columnName: 'name', value: helpline.name ?? ''),
+          DataGridCell<String>(columnName: 'type', value: helpline.type ?? ''),
+          DataGridCell<String>(
+              columnName: 'phone', value: helpline.phone ?? ''),
+          DataGridCell<String>(
+              columnName: 'address', value: helpline.address ?? ''),
+          DataGridCell<String>(
+              columnName: 'status',
+              value: helpline.status == '1' ? 'Active' : 'Inactive'),
+          DataGridCell<Widget>(
+              columnName: 'actions',
+              value: PopupMenuButton<String>(
+                onSelected: (String value) {
+                  if (value == 'Update') {
+                    onUpdate(helpline);
+                  } else if (value == 'Delete') {
+                    onDelete(helpline);
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return {'Update', 'Delete'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
+              )),
+        ],
+      );
+      counter++;
+      return row;
+    }).toList();
   }
 
   List<DataGridRow> _helplines = [];

@@ -1,28 +1,26 @@
 class VistorResponse {
   String? sTATUS;
   List<DBDATA>? dBDATA;
-  
+
   String? eRRORDESCRIPTION;
 
   VistorResponse({this.sTATUS, this.dBDATA, this.eRRORDESCRIPTION});
 
   VistorResponse.fromJson(Map<String, dynamic> json) {
     sTATUS = json['STATUS'];
-     if (json['STATUS'] != 'ERROR') {
-    if (json['DB_DATA'] != null) {
-      dBDATA = <DBDATA>[];
-      json['DB_DATA'].forEach((v) {
-        dBDATA!.add(DBDATA.fromJson(v));
-      });
-      eRRORDESCRIPTION=null;
-    }}else{
-dBDATA = null;
+    if (json['STATUS'] != 'ERROR') {
+      if (json['DB_DATA'] != null) {
+        dBDATA = <DBDATA>[];
+        json['DB_DATA'].forEach((v) {
+          dBDATA!.add(DBDATA.fromJson(v));
+        });
+        eRRORDESCRIPTION = null;
+      }
+    } else {
+      dBDATA = null;
       eRRORDESCRIPTION = json['ERROR_DESCRIPTION'];
     }
-    
   }
-
- 
 }
 
 class DBDATA {
@@ -32,6 +30,7 @@ class DBDATA {
   String? visitorSurname;
   String? visitorEmail;
   String? visitorPhone;
+  String? visitoralphaid;
   String? status;
   int? entryTime;
   String? orgName;
@@ -43,6 +42,7 @@ class DBDATA {
       this.visitorName,
       this.visitorSurname,
       this.visitorEmail,
+      this.visitoralphaid,
       this.visitorPhone,
       this.status,
       this.entryTime,
@@ -55,11 +55,11 @@ class DBDATA {
     visitorName = json['visitor_name'];
     visitorSurname = json['visitor_surname'];
     visitorEmail = json['visitor_email'];
+    visitoralphaid = json['visitor_alpha_id'];
     visitorPhone = json['visitor_phone'];
     status = json['status'];
     entryTime = json['entry_time'];
     orgName = json['org_name'];
     entryTimeFormated = json['entry_time_formated'];
   }
-
 }

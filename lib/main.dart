@@ -2,10 +2,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:toastification/toastification.dart';
+
 import 'core/app_export.dart';
 import 'presentation/alerts_screen/provider/alerts_provider.dart';
 
 // Device Update
+
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 final scaffoldKey = GlobalKey<ScaffoldMessengerState>();

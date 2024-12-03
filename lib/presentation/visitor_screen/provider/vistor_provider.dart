@@ -65,23 +65,47 @@ class VisitorProvider extends ChangeNotifier {
     });
   }
 
-  FutureOr<void> updateVisitorData(
-      {String? id, String? visitor_name, String? visitor_status}) async {
-    USERDATA userdata = prefUtils.getUserData()!;
+  Future<void> archivealert(String alertId, String alphaid) async {
+    // USERDATA userdata = prefUtils.getUserData()!;
 
+    await _repository.orderDevice(
+      formData: {
+        'operation': 'archive_visitor',
+        'alert_id': alertId,
+        'visitor_alpha_id': alphaid
+      },
+    ).then((value) async {
+      if (value.sTATUS != "ERROR") {
+        showSuccess(value.dESCRIPTION ?? '');
+        await loadVisitorData();
+      } else {
+        showError(value.eRRORDESCRIPTION ?? 'Error Deleting alert status.');
+      }
+    });
+  }
+
+  FutureOr<void> updateVisitorData(
+      {String? id,
+      String? visitorName,
+      String? visitorStatus,
+      String? visitorPhone,
+      String? alphaid}) async {
+    print('$visitorPhone');
     await _repository.deleteVisoterData(
       formData: {
         'operation': 'update_visitor',
         'visitor_id': id,
-        'visitor_name': visitor_name,
-        'visitor_status': visitor_status
+        'visitor_alpha_id': alphaid,
+        'visitor_name': visitorName,
+        'visitor_status': visitorStatus,
+        'visitor_phone': visitorPhone,
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
         // Remove the visitor from the list
 
         notifyListeners();
-
+        loadVisitorData();
         showSuccess('Visitor Updated successfully');
       } else {
         showError(value.eRRORDESCRIPTION ?? 'Failed to Updated visitor');

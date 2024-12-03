@@ -3,6 +3,7 @@ import 'package:fyrebox/presentation/rigister_screen/register_org_screen.dart';
 import 'package:fyrebox/presentation/rigister_screen/rigister_screen.dart';
 import 'package:fyrebox/presentation/setting/change_password/change_password.dart';
 import 'package:fyrebox/presentation/setting/profile/profile_screen.dart';
+
 import '../core/app_export.dart';
 import '../presentation/alerts_screen/alerts_screen.dart';
 import '../presentation/app_navigation_screen/app_navigation_screen.dart';
@@ -18,6 +19,7 @@ import '../presentation/privacy_screen/privacy_screen.dart';
 import '../presentation/root_screen/root_screen.dart';
 import '../presentation/setting/contact_info/contact_info_screen.dart';
 import '../presentation/setting/logo/logo_screen.dart';
+import '../presentation/setting/organization/organization_password.dart';
 import '../presentation/splash_screen/splash_screen.dart';
 import '../presentation/user_screen/add_org_screen.dart';
 import '../presentation/user_screen/user_screen.dart';
@@ -41,6 +43,7 @@ class AppRoutes {
   static const String userScreen = '/user_screen';
   static const String editScreen = '/edit_screen';
   static const String contactInfoScreen = '/contactInfoScreen';
+  static const String organizationNameScreen = '/organizationNameScreen';
   static const String settingScreen = '/settingScreen';
   static const String changePasswordScreen = '/changePasswordScreen';
   static const String alertscreen = '/alertscreen';
@@ -53,6 +56,7 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> get routes => {
         orderDeviceScreen: OrderDeviceScreen.builder,
+        organizationNameScreen: OrganizationNameScreen.builder,
         registerOrganizationScreen: RegisterOrganizationScreen.builder,
         organizationScreen: OrganizationScreen.builder,
         addOrgScreen: AddOrganizationUserScreen.builder,
