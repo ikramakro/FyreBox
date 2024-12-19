@@ -7,7 +7,7 @@ class CustomTextFormField1 extends StatelessWidget {
     this.width,
     this.scrollPadding,
     this.controller,
-    this.focusNode,
+    // this.focusNode,
     this.autofocus = true,
     this.textStyle,
     this.obscureText = false,
@@ -33,7 +33,7 @@ class CustomTextFormField1 extends StatelessWidget {
   final double? width;
   final TextEditingController? scrollPadding;
   final TextEditingController? controller;
-  final FocusNode? focusNode;
+  // final FocusNode? focusNode;
   final bool? autofocus;
   final TextStyle? textStyle;
   final bool? obscureText;
@@ -70,7 +70,7 @@ class CustomTextFormField1 extends StatelessWidget {
           scrollPadding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           controller: controller,
-          focusNode: focusNode ?? FocusNode(),
+          // focusNode: focusNode ?? FocusNode(),
           autofocus: autofocus!,
           style: textStyle ?? theme.textTheme.bodyLarge,
           obscureText: obscureText!,
@@ -98,7 +98,7 @@ class CustomTextFormField1 extends StatelessWidget {
         border: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.h),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 // color: appTheme.blueGray100,
                 width: 1,
               ),
@@ -106,7 +106,7 @@ class CustomTextFormField1 extends StatelessWidget {
         enabledBorder: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.h),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 // color: appTheme.blueGray100,
                 width: 1,
               ),
@@ -114,7 +114,7 @@ class CustomTextFormField1 extends StatelessWidget {
         focusedBorder: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.h),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 // color: appTheme.blueGray100,
                 width: 1,
               ),
@@ -131,7 +131,8 @@ extension TextFormFieldStyleHelper on CustomTextFormField1 {
         borderRadius: BorderRadius.circular(10.h),
         borderSide: BorderSide.none,
       );
-  static UnderlineInputBorder get underLineBlueGray => UnderlineInputBorder(
+  static UnderlineInputBorder get underLineBlueGray =>
+      const UnderlineInputBorder(
         borderSide: BorderSide(
             // color: appTheme.blueGray100,
             ),

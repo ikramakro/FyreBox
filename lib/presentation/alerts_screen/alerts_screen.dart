@@ -4,7 +4,6 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../core/app_export.dart';
-import '../../widgets/customCheckbox.dart';
 import '../../widgets/custom_drop_down.dart'; // Replace CustomRadioButton with CustomCheckbox
 import 'provider/alerts_provider.dart';
 
@@ -28,65 +27,135 @@ class AlertScreenState extends State<AlertScreen> {
     super.initState();
   }
 
+  DateTime? _startDate;
+  DateTime? _endDate;
+
   void _showUpdateAlertPopup(
       BuildContext context, DBDATA alert, AlertsProvider provider) {
-    provider.setSelectedStatus(alert.status);
-
+    String visitorStatus = alert.status!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Update Alert Details'),
-          content: Consumer<AlertsProvider>(
-            builder: (context, provider, child) {
-              return Column(
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Update Visitor Details'),
+            content: SingleChildScrollView(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16.0),
-                  const Text('Alert Status:', style: TextStyle(fontSize: 12.0)),
+                  const Text('Visitor Status:',
+                      style: TextStyle(fontSize: 12.0)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomCheckbox(
-                        value: provider.selectedStatus == '1',
-                        text: 'Active',
+                      Checkbox(
+                        value: visitorStatus == '1',
                         onChanged: (value) {
-                          provider.setSelectedStatus(value ? '1' : '0');
+                          setState(() {
+                            visitorStatus = '1';
+                          });
                         },
                       ),
-                      CustomCheckbox(
-                        value: provider.selectedStatus == '0',
-                        text: 'Inactive',
+                      const Text('Active'),
+                      Checkbox(
+                        value: visitorStatus == '0',
                         onChanged: (value) {
-                          provider.setSelectedStatus(value ? '0' : '1');
+                          setState(() {
+                            visitorStatus = '0';
+                          });
                         },
                       ),
+                      const Text('Inactive'),
                     ],
                   ),
                 ],
-              );
-            },
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Update'),
+                onPressed: () async {
+                  await provider.updateAlertStatus(
+                    alert.id.toString(),
+                    visitorStatus,
+                  );
+                  // print(phonecontr.text);
+                  // provider.updateVisitorData(
+                  //     id: visitor.id.toString(),
+                  //     visitorName: namecontr.text,
+                  //     visitorStatus: visitorStatus,
+                  //     visitorPhone: phonecontr.text,
+                  //     alphaid: visitor.visitoralphaid.toString());
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Update'),
-              onPressed: () async {
-                await provider.updateAlertStatus(alert.id.toString());
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
+
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return AlertDialog(
+    //       title: const Text('Update Alert Details'),
+    //       content: Consumer<AlertsProvider>(
+    //         builder: (context, provider, child) {
+    //           return Column(
+    //             mainAxisSize: MainAxisSize.min,
+    //             mainAxisAlignment: MainAxisAlignment.start,
+    //             crossAxisAlignment: CrossAxisAlignment.start,
+    //             children: [
+    //               const SizedBox(height: 16.0),
+    //               const Text('Alert Status:', style: TextStyle(fontSize: 12.0)),
+    //               Row(
+    //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                 children: [
+    //                   CustomCheckbox(
+    //                     value: provider.selectedStatus == '1',
+    //                     text: 'Active',
+    //                     onChanged: (value) {
+    //                       provider.setSelectedStatus(!value ? '1' : '0');
+    //                     },
+    //                   ),
+    //                   CustomCheckbox(
+    //                     value: provider.selectedStatus == '0',
+    //                     text: 'Inactive',
+    //                     onChanged: (value) {
+    //                       provider.setSelectedStatus(!value ? '0' : '1');
+    //                     },
+    //                   ),
+    //                 ],
+    //               ),
+    //             ],
+    //           );
+    //         },
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           child: const Text('Cancel'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //         TextButton(
+    //           child: const Text('Update'),
+    //           onPressed: () async {
+    //             await provider.updateAlertStatus(alert.id.toString());
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
   }
 
   void _showDeleteConfirmationDialog(
@@ -137,12 +206,43 @@ class AlertScreenState extends State<AlertScreen> {
     );
   }
 
+  // Method to pick a date
+  Future<void> _selectDate(
+      BuildContext context, bool isStartDate, AlertsProvider provider) async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = pickedDate;
+        } else {
+          _endDate = pickedDate;
+          provider.filterAlertsByDate(_startDate!, _endDate!);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => AlertsProvider(),
       child: SafeArea(
         child: Scaffold(
+          floatingActionButton: Consumer<AlertsProvider>(
+            builder: (context, provider, child) => FloatingActionButton(
+              onPressed: () {
+                provider.onChanged('');
+              },
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.archive),
+            ),
+          ),
           extendBody: true,
           extendBodyBehindAppBar: true,
           body: Consumer<AlertsProvider>(
@@ -194,6 +294,134 @@ class AlertScreenState extends State<AlertScreen> {
                         ],
                       ),
                     ),
+                    // Date Picker Row
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Consumer<AlertsProvider>(
+                              builder: (context, provider, child) => SizedBox(
+                                height: 50.v,
+                                width: 100.h,
+                                child: TextFormField(
+                                  // controller: provider.confirmPasswordController,
+                                  // obscureText: provider.isShowPassword,
+                                  onTap: () =>
+                                      _selectDate(context, true, provider),
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    hintText: _startDate != null
+                                        ? _startDate!
+                                            .toLocal()
+                                            .toString()
+                                            .split(' ')[0]
+                                        : 'Select Start Date',
+                                    filled: true,
+                                    hintStyle: const TextStyle(fontSize: 10),
+                                    fillColor: const Color.fromARGB(
+                                        255, 252, 205, 204),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 24.0, vertical: 16.0),
+                                    border: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(50)),
+                                    ),
+                                  ),
+                                  // validator: (value) {
+                                  //   if (value == null ||
+                                  //       value !=
+                                  //           provider.passwordController.text) {
+                                  //     return "Passwords do not match";
+                                  //   }
+                                  //   return null;
+                                  // },
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Expanded(
+                            child: Consumer<AlertsProvider>(
+                              builder: (context, provider, child) => SizedBox(
+                                height: 50.v,
+                                width: 100.h,
+                                child: TextFormField(
+                                  // controller: provider.confirmPasswordController,
+                                  // obscureText: provider.isShowPassword,
+                                  onTap: () =>
+                                      _selectDate(context, false, provider),
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    hintText: _endDate != null
+                                        ? _endDate!
+                                            .toLocal()
+                                            .toString()
+                                            .split(' ')[0]
+                                        : 'Select End Date',
+                                    filled: true,
+                                    hintStyle: const TextStyle(fontSize: 10),
+                                    fillColor: const Color.fromARGB(
+                                        255, 252, 205, 204),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 24.0, vertical: 16.0),
+                                    border: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(50)),
+                                    ),
+                                  ),
+                                  // validator: (value) {
+                                  //   if (value == null ||
+                                  //       value !=
+                                  //           provider.passwordController.text) {
+                                  //     return "Passwords do not match";
+                                  //   }
+                                  //   return null;
+                                  // },
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // TextButton(
+                          //   onPressed: () => _selectDate(context, true),
+                          //   child: Text(
+                          // _startDate != null
+                          //     ? "Start Date: ${_startDate!.toLocal().toString().split(' ')[0]}"
+                          //     : 'Select Start Date',
+                          //   ),
+                          // ),
+                          // TextButton(
+                          //   onPressed: () => _selectDate(context, false),
+                          //   child: Text(
+                          // _endDate != null
+                          //     ? "End Date: ${_endDate!.toLocal().toString().split(' ')[0]}"
+                          //     : 'Select End Date',
+                          //   ),
+                          // ),
+                          // ElevatedButton(
+                          //   onPressed: () {
+                          //     if (_startDate != null && _endDate != null) {
+                          //       // provider.loadAlertData(
+                          //       //   startDate: _startDate!.toIso8601String(),
+                          //       //   endDate: _endDate!.toIso8601String(),
+                          //       // );
+                          //     } else {
+                          //       // showError(
+                          //       //     "Please select both start and end dates.");
+                          //     }
+                          //   },
+                          //   child: const Text('Filter'),
+                          // ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
                     SizedBox(width: 20.h),
                     const Divider(),
                     Consumer<AlertsProvider>(
@@ -349,17 +577,12 @@ class AlertDataSource extends DataGridSource {
         DataGridCell<Widget>(
           columnName: 'status',
           value: Center(
-              child: SizedBox(
-            width: 100,
-            height: 70,
             child: Card(
-              color: alert.status == '1'
-                  ? Colors.lightGreen
-                  : Colors.red.withOpacity(.5),
-              child: Center(
-                  child: Text(alert.status == '1' ? 'Active' : 'Inactive')),
+              color: _getStatusColor(alert.status.toString()),
+              child:
+                  Center(child: Text(_getStatusText(alert.status.toString()))),
             ),
-          )),
+          ),
         ),
         DataGridCell<String>(
             columnName: 'entryTime', value: alert.entryTimeFormated),
@@ -409,5 +632,31 @@ class AlertDataSource extends DataGridSource {
         );
       }).toList(),
     );
+  }
+
+  String _getStatusText(String? status) {
+    switch (status) {
+      case '1':
+        return 'Active';
+      case '0':
+        return 'Inactive';
+      case '3':
+        return 'Archived';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case '1':
+        return Colors.lightGreen;
+      case '0':
+        return Colors.red.withOpacity(0.5);
+      case '3':
+        return Colors.grey;
+      default:
+        return Colors.black; // Default fallback color
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import '../../../core/app_export.dart';
 import '../../../core/utils/constant.dart';
@@ -16,12 +17,56 @@ class AlertsProvider extends ChangeNotifier {
   LocalStorageService sp = LocalStorageService();
   PrefUtils prefUtils = PrefUtils();
   String? selectedStatus;
+  List<DBDATA> _filteredAlerts = []; // Holds filtered data
   AlertsProvider() {
     init();
   }
 
   init() async {
     await loadAlertData();
+  }
+
+  // void filterAlertsByDate(DateTime startDate, DateTime endDate) {
+  //   log('Start Date ${startDate.toString()}');
+  //   log('End Date ${endDate.toString()}');
+  //   if (model.dBDATA != null) {
+  //     _filteredAlerts = model.dBDATA!.where((alert) {
+  //       DateTime alertDate = DateTime.parse(alert.entryTimeFormated ?? '');
+  //       log('Alert Date ${alertDate.toString()}');
+  //       return alertDate.isAfter(startDate.subtract(const Duration(days: 1))) &&
+  //           alertDate.isBefore(endDate.add(const Duration(days: 1)));
+  //     }).toList();
+  //     model.dBDATA = _filteredAlerts;
+  //   }
+  //   notifyListeners();
+  // }
+  void filterAlertsByDate(DateTime startDate, DateTime endDate) {
+    log('Start Date: ${startDate.toString()}');
+    log('End Date: ${endDate.toString()}');
+
+    if (model.dBDATA != null) {
+      _filteredAlerts = model.dBDATA!.where((alert) {
+        try {
+          // Convert Unix time (seconds) to DateTime
+          int unixTime = int.tryParse(alert.entryTimeFormated ?? '0') ?? 0;
+          DateTime alertDate =
+              DateTime.fromMillisecondsSinceEpoch(unixTime * 1000, isUtc: true);
+
+          log('Alert Date: ${alertDate.toString()}');
+
+          // Compare the converted date with start and end date
+          return alertDate
+                  .isAfter(startDate.subtract(const Duration(days: 1))) &&
+              alertDate.isBefore(endDate.add(const Duration(days: 1)));
+        } catch (e) {
+          log('Error parsing date: $e');
+          return false;
+        }
+      }).toList();
+
+      // Do not overwrite the original list, only use _filteredAlerts
+      notifyListeners();
+    }
   }
 
   void setSelectedStatus(String? status) {
@@ -36,11 +81,7 @@ class AlertsProvider extends ChangeNotifier {
     USERDATA userdata = prefUtils.getUserData()!;
 
     await _repository.alertData(
-      formData: {
-        'operation': 'get_alerts',
-        'access_token': 'developer_bypass',
-        'user_id': userdata.orgId
-      },
+      formData: {'operation': 'get_alerts', 'user_id': userdata.orgId},
     ).then((value) async {
       model = AlertResponse();
       model = value;
@@ -52,17 +93,14 @@ class AlertsProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> updateAlertStatus(
-    String alertId,
-  ) async {
+  Future<void> updateAlertStatus(String alertId, String selectedStatus) async {
     // USERDATA userdata = prefUtils.getUserData()!;
 
     await _repository.orderDevice(
       formData: {
         'operation': 'update_alert',
-        'access_token': 'developer_bypass',
         'alert_id': alertId,
-        'status': selectedStatus,
+        'alert_status': selectedStatus,
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
@@ -180,7 +218,9 @@ class AlertsProvider extends ChangeNotifier {
             ? '1'
             : value == 'In-Active'
                 ? '0'
-                : '3'
+                : value == 'All'
+                    ? ''
+                    : '3'
       },
     ).then((value) async {
       model = value;

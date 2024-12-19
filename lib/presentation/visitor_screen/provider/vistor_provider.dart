@@ -71,8 +71,8 @@ class VisitorProvider extends ChangeNotifier {
     await _repository.orderDevice(
       formData: {
         'operation': 'archive_visitor',
-        'alert_id': alertId,
-        'visitor_alpha_id': alphaid
+        'visitor_id': alertId,
+        // 'visitor_alpha_id': alphaid
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
@@ -129,7 +129,7 @@ class VisitorProvider extends ChangeNotifier {
                 ? '0'
                 : value == 'Permanent Employees'
                     ? '4'
-                    : '2'
+                    : '3'
       },
     ).then((value) async {
       model = value;

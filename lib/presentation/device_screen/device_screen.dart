@@ -443,7 +443,7 @@ class DeviceScreenState extends State<DeviceScreen> {
                                     GridLinesVisibility.both,
                                 columnWidthMode: ColumnWidthMode.auto,
                                 onQueryRowHeight: (details) {
-                                  return 30;
+                                  return 40.v;
                                 },
                                 columns: <GridColumn>[
                                   GridColumn(
@@ -464,13 +464,14 @@ class DeviceScreenState extends State<DeviceScreen> {
                                   GridColumn(
                                     columnName: 'devicename',
                                     label: const Center(
-                                        child: Text('Device Name')),
+                                      child: Text('Device Name And Location'),
+                                    ),
                                   ),
-                                  GridColumn(
-                                    columnName: 'location',
-                                    label:
-                                        const Center(child: Text('Location')),
-                                  ),
+                                  // GridColumn(
+                                  //   columnName: 'location',
+                                  //   label:
+                                  //       const Center(child: Text('Location')),
+                                  // ),
                                   GridColumn(
                                     allowFiltering: false,
                                     columnName: 'devicekey',
@@ -513,7 +514,10 @@ class DeviceDataSource extends DataGridSource {
     required this.onPreviousReports,
   }) {
     int counter = 1;
+
     _devices = devices.map<DataGridRow>((device) {
+      final combinedField =
+          '${device.deviceName ?? ''} , ${device.deviceLocation ?? ''}';
       final newRow = DataGridRow(cells: [
         DataGridCell<String>(columnName: 'no', value: counter.toString()), // No
         DataGridCell<String>(
@@ -524,10 +528,10 @@ class DeviceDataSource extends DataGridSource {
             value: device.deviceCiteName ?? ''), // Site Name
         DataGridCell<String>(
             columnName: 'devicename',
-            value: device.deviceName ?? ''), // Device Name
-        DataGridCell<String>(
-            columnName: 'location',
-            value: device.deviceLocation ?? ''), // Location
+            value: combinedField ?? ''), // Device Name
+        // DataGridCell<String>(
+        //     columnName: 'location',
+        //     value: device.deviceLocation ?? ''), // Location
         DataGridCell<String>(
             columnName: 'devicekey',
             value: device.deviceKey ?? ''), // Device Key
@@ -585,17 +589,21 @@ class DeviceDataSource extends DataGridSource {
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(cells: [
-      Center(child: Text(row.getCells()[0].value.toString())), // NO
+      Center(
+          child: Text(
+        row.getCells()[0].value.toString(),
+        maxLines: 2,
+      )), // NO
       Center(child: Text(row.getCells()[1].value.toString())), // Device Type
       Center(child: Text(row.getCells()[2].value.toString())), // Site Name
       Center(child: Text(row.getCells()[3].value.toString())), // Device Name
-      Center(child: Text(row.getCells()[4].value.toString())), // Location
-      Center(child: Text(row.getCells()[5].value.toString())), // Device Key
+      // Center(child: Text(row.getCells()[4].value.toString())), // Location
+      Center(child: Text(row.getCells()[4].value.toString())), // Device Key
       SizedBox(
         height: 10.v,
         width: 10.h,
         child: Card(
-          color: row.getCells()[6].value.toString() == 'Active'
+          color: row.getCells()[5].value.toString() == 'Active'
               ? Colors.lightGreen
               : Colors.red.withOpacity(.5),
           child: Center(
@@ -607,7 +615,7 @@ class DeviceDataSource extends DataGridSource {
       SizedBox(
         height: 10.v,
         width: 5.h,
-        child: row.getCells()[7].value, // Actions
+        child: row.getCells()[6].value, // Actions
       ),
     ]);
   }

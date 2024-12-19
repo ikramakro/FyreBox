@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyrebox/presentation/rigister_screen/register_org_screen.dart';
 import 'package:fyrebox/presentation/rigister_screen/rigister_screen.dart';
+import 'package:fyrebox/presentation/rigister_screen/term_screen.dart';
 import 'package:fyrebox/presentation/setting/change_password/change_password.dart';
 import 'package:fyrebox/presentation/setting/profile/profile_screen.dart';
 
@@ -30,6 +31,8 @@ class AppRoutes {
   static const String splashScreen = '/splash_screen';
   // static const String loginScreenDarkScreen = '/login_screen_dark_screen';
   static const String loginScreen = '/login_screen';
+  static const String termScreen = '/termScreen';
+
   static const String registerOrganizationScreen =
       '/registerOrganizationScreen';
   static const String signUpScreen = '/signUp_Screen';
@@ -57,7 +60,11 @@ class AppRoutes {
   static Map<String, WidgetBuilder> get routes => {
         orderDeviceScreen: OrderDeviceScreen.builder,
         organizationNameScreen: OrganizationNameScreen.builder,
-        registerOrganizationScreen: RegisterOrganizationScreen.builder,
+
+        registerOrganizationScreen: (context) =>
+            RegisterOrganizationScreen.builder(context,
+                email: ModalRoute.of(context)?.settings.arguments as String?),
+
         organizationScreen: OrganizationScreen.builder,
         addOrgScreen: AddOrganizationUserScreen.builder,
         addVisitorScreen: AddVisitorScreen.builder,
@@ -69,6 +76,10 @@ class AppRoutes {
         alertscreen: const AlertScreen().builder,
         deviceScreen: const DeviceScreen().builder,
         vistorScreen: const VistorScreen().builder,
+        termScreen: (v) {
+          return const TermScreen();
+        },
+
         rootScreen: (context) => RootScreen.builder(context,
             index: ModalRoute.of(context)?.settings.arguments as int?),
         splashScreen: SplashScreen.builder,

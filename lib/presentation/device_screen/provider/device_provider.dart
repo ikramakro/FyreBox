@@ -268,7 +268,7 @@ class DeviceProvider extends ChangeNotifier {
         'device_quantity': quantityController.text,
         'device_description': descriptionController.text,
         'operation': 'order_device',
-        'access_token': 'developer_bypass',
+        // 'access_token': 'developer_bypass',
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
@@ -297,7 +297,7 @@ class DeviceProvider extends ChangeNotifier {
         'manufacturer_date': mfrDateController.text,
         'serial_number': serialNumberController.text,
         'operation': 'add_device',
-        'access_token': 'developer_bypass',
+        // 'access_token': 'developer_bypass',
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
@@ -377,7 +377,7 @@ class DeviceProvider extends ChangeNotifier {
         'update_access': hasUpdateAccess ? '1' : '0',
         'delete_access': hasDeleteAccess ? '1' : '0',
         'operation': 'add_org_user',
-        'access_token': 'developer_bypass',
+        // 'access_token': 'developer_bypass',
       },
     ).then((value) async {
       if (value.sTATUS != "ERROR") {
@@ -399,8 +399,8 @@ class DeviceProvider extends ChangeNotifier {
     await _repository.deviceData(
       formData: {
         'operation': 'get_devices',
-        'access_token': 'developer_bypass',
-        'org_id': userdata.orgId
+        // 'access_token': 'developer_bypass',
+        // 'org_id': userdata.orgId
       },
     ).then((value) async {
       model = value;
@@ -466,8 +466,8 @@ class DeviceProvider extends ChangeNotifier {
       await _repository.deviceData(
         formData: {
           'operation': 'get_devices',
-          'access_token': 'developer_bypass',
-          'org_id': org,
+          // 'access_token': 'developer_bypass',
+          // 'org_id': org,
           'status': '1'
         },
       ).then((value) async {
@@ -482,8 +482,8 @@ class DeviceProvider extends ChangeNotifier {
       await _repository.deviceData(
         formData: {
           'operation': 'get_devices',
-          'access_token': 'developer_bypass',
-          'org_id': org,
+          // 'access_token': 'developer_bypass',
+          // 'org_id': org,
           'status': '0'
         },
       ).then((value) async {
@@ -498,8 +498,8 @@ class DeviceProvider extends ChangeNotifier {
       await _repository.deviceData(
         formData: {
           'operation': 'get_devices',
-          'access_token': 'developer_bypass',
-          'org_id': org,
+          // 'access_token': 'developer_bypass',
+          // 'org_id': org,
         },
       ).then((value) async {
         model = value;

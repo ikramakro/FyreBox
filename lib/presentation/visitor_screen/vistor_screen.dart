@@ -44,22 +44,24 @@ class VistorScreenState extends State<VistorScreen> {
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: const Text('Visitor Qr Code'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // const SizedBox(height: 16.0),
-                // const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
-                Screenshot(
-                  controller: screenshotController,
-                  child: QrImageView(
-                    data:
-                        'https://fyreboxhub.com/add_visitor?org_id=${provider.userdata?.orgId ?? ''}',
-                    version: QrVersions.auto,
-                    size: 200.0,
-                    backgroundColor: Colors.white,
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // const SizedBox(height: 16.0),
+                  // const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
+                  Screenshot(
+                    controller: screenshotController,
+                    child: QrImageView(
+                      data:
+                          'https://fyreboxhub.com/add_visitor?org_id=${provider.userdata?.orgId ?? ''}',
+                      version: QrVersions.auto,
+                      size: 200.0,
+                      backgroundColor: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -152,47 +154,50 @@ class VistorScreenState extends State<VistorScreen> {
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: const Text('Update Visitor Details'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 16.0),
-                const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
-                CustomTextFormField1(
-                  controller: namecontr,
-                  hintText: visitor.visitorName,
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
-                CustomTextFormField1(
-                  controller: phonecontr,
-                  hintText: visitor.visitorPhone,
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Visitor Status:', style: TextStyle(fontSize: 12.0)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Checkbox(
-                      value: visitorStatus == '1',
-                      onChanged: (value) {
-                        setState(() {
-                          visitorStatus = '1';
-                        });
-                      },
-                    ),
-                    const Text('Active'),
-                    Checkbox(
-                      value: visitorStatus == '2',
-                      onChanged: (value) {
-                        setState(() {
-                          visitorStatus = '2';
-                        });
-                      },
-                    ),
-                    const Text('Inactive'),
-                  ],
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16.0),
+                  const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
+                  CustomTextFormField1(
+                    controller: namecontr,
+                    hintText: visitor.visitorName,
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Visitor Name:', style: TextStyle(fontSize: 12.0)),
+                  CustomTextFormField1(
+                    controller: phonecontr,
+                    hintText: visitor.visitorPhone,
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Visitor Status:',
+                      style: TextStyle(fontSize: 12.0)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Checkbox(
+                        value: visitorStatus == '1',
+                        onChanged: (value) {
+                          setState(() {
+                            visitorStatus = '1';
+                          });
+                        },
+                      ),
+                      const Text('Active'),
+                      Checkbox(
+                        value: visitorStatus == '2',
+                        onChanged: (value) {
+                          setState(() {
+                            visitorStatus = '2';
+                          });
+                        },
+                      ),
+                      const Text('Inactive'),
+                    ],
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -269,6 +274,52 @@ class VistorScreenState extends State<VistorScreen> {
     );
   }
 
+  void showUpdateEmployeePopup(BuildContext context, VisitorProvider provider) {
+    ScreenshotController screenshotController = ScreenshotController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Employee QR Code'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Screenshot(
+                    controller: screenshotController,
+                    child: QrImageView(
+                      data:
+                          'https://fyreboxhub.com/add_visitor?employee=1&org_id=${provider.userdata?.orgId ?? ''}',
+                      version: QrVersions.auto,
+                      size: 200.0,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Download'),
+                onPressed: () async {
+                  await _captureAndSaveQRCode(screenshotController, context);
+                },
+              ),
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -333,12 +384,60 @@ class VistorScreenState extends State<VistorScreen> {
                           SizedBox(
                             height: 50.v,
                             width: 100.v,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  showUpdateVisitorPopup(context, provider);
+                            child: PopupMenuButton<String>(
+                                onSelected: (String value) {
+                                  if (value == 'Visitor QR Code') {
+                                    showUpdateVisitorPopup(context, provider);
+                                  } else if (value == 'Employee QR Code') {
+                                    showUpdateEmployeePopup(
+                                        context, provider); // Add this function
+                                  }
                                 },
-                                child: const Text('QR Code')),
-                          )
+                                itemBuilder: (BuildContext context) {
+                                  return {'Visitor QR Code', 'Employee QR Code'}
+                                      .map((String choice) {
+                                    return PopupMenuItem<String>(
+                                      value: choice,
+                                      child: Text(choice),
+                                    );
+                                  }).toList();
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: appTheme.deepOrangeA100,
+                                    borderRadius: BorderRadius.circular(20),
+                                    // boxShadow: [
+                                    //   BoxShadow(
+                                    //     color: Colors.grey.withOpacity(0.5),
+                                    //     spreadRadius: -3,
+                                    //     blurRadius: 7,
+                                    //     offset: const Offset(
+                                    //         0, 3), // changes position of shadow
+                                    //   ),
+                                    // ],
+                                  ),
+                                  child: const Center(
+                                      child: Text(
+                                    'QR Code ',
+                                    style: TextStyle(color: Colors.black),
+                                  )),
+                                )
+                                // ElevatedButton(
+                                //   onPressed: null,
+                                //   // Disabled since we are using PopupMenuButton
+                                //   child: Text('QR Code '),
+                                // ),
+                                ),
+                          ),
+                          // SizedBox(
+                          //   height: 50.v,
+                          //   width: 100.v,
+                          //   child: ElevatedButton(
+                          //       onPressed: () {
+                          //         showUpdateVisitorPopup(context, provider);
+                          //       },
+                          //       child: const Text('QR Code')),
+                          // )
                         ],
                       ),
                     ),
@@ -451,11 +550,12 @@ showAlertDialog(BuildContext context) {
 }
 
 class VisitorDataSource extends DataGridSource {
-  VisitorDataSource(
-      {required List<DBDATA> visitors,
-      required this.onUpdate,
-      required this.onDelete,
-      required this.onArrchive}) {
+  VisitorDataSource({
+    required List<DBDATA> visitors,
+    required this.onUpdate,
+    required this.onDelete,
+    required this.onArrchive,
+  }) {
     int counter = 1;
     _visitors = visitors.map<DataGridRow>((visitor) {
       final row = DataGridRow(cells: [
@@ -463,35 +563,37 @@ class VisitorDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'visitorName', value: visitor.visitorName),
         DataGridCell<String>(
-            columnName: 'visitorId', value: visitor.id.toString()),
+            columnName: 'visitorId', value: visitor.visitoralphaid.toString()),
         DataGridCell<String>(
             columnName: 'visitorPhone', value: visitor.visitorPhone),
         DataGridCell<String>(
-            columnName: 'status',
-            value: visitor.status == '1' ? 'Active' : 'Inactive'),
+          columnName: 'status',
+          value: _getStatusText(visitor.status),
+        ),
         DataGridCell<String>(
             columnName: 'entryTime', value: visitor.entryTimeFormated),
         DataGridCell<Widget>(
-            columnName: 'actions',
-            value: PopupMenuButton<String>(
-              onSelected: (String value) {
-                if (value == 'Update') {
-                  onUpdate(visitor);
-                } else if (value == 'Delete') {
-                  onDelete(visitor);
-                } else if (value == 'Archive') {
-                  onArrchive(visitor);
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return {'Update', 'Delete', 'Archive'}.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )),
+          columnName: 'actions',
+          value: PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'Update') {
+                onUpdate(visitor);
+              } else if (value == 'Delete') {
+                onDelete(visitor);
+              } else if (value == 'Archive') {
+                onArrchive(visitor);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'Update', 'Delete', 'Archive'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ),
       ]);
       counter++;
       return row;
@@ -514,16 +616,39 @@ class VisitorDataSource extends DataGridSource {
       Center(child: Text(row.getCells()[2].value.toString())),
       Center(child: Text(row.getCells()[3].value.toString())),
       Center(
-          child: Card(
-        color: row.getCells()[4].value == 'Active'
-            ? Colors.lightGreen
-            : Colors.red.withOpacity(.5),
-        child: Center(
-            child: Text(
-                row.getCells()[4].value == 'Active' ? 'Active' : 'Inactive')),
-      )),
+        child: Card(
+          color: _getStatusColor(row.getCells()[4].value),
+          child: Center(child: Text(row.getCells()[4].value.toString())),
+        ),
+      ),
       Center(child: Text(row.getCells()[5].value.toString())),
       Center(child: row.getCells()[6].value),
     ]);
+  }
+
+  String _getStatusText(String? status) {
+    switch (status) {
+      case '1':
+        return 'Active';
+      case '2':
+        return 'Inactive';
+      case '3':
+        return 'Archived';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Active':
+        return Colors.lightGreen;
+      case 'Inactive':
+        return Colors.red.withOpacity(0.5);
+      case 'Archived':
+        return Colors.grey;
+      default:
+        return Colors.black; // Default fallback color
+    }
   }
 }

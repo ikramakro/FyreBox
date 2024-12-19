@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 
 class CustomCheckbox extends StatelessWidget {
   final bool value;
-  final String text;
+  final String firsttext;
+  final String secondtext;
   final ValueChanged<bool> onChanged;
-
+  final bool isSignUp;
+  final VoidCallback? ontap;
   const CustomCheckbox({
     super.key,
     required this.value,
-    required this.text,
+    required this.firsttext,
+    required this.secondtext,
     required this.onChanged,
+    this.ontap,
+    this.isSignUp = false, // Default to false for checkbox in sign up page.
   });
 
   @override
@@ -24,7 +29,22 @@ class CustomCheckbox extends StatelessWidget {
             }
           },
         ),
-        Text(text, style: const TextStyle(fontSize: 14.0)),
+        isSignUp
+            ? Row(
+                children: [
+                  Text(firsttext,
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                      )),
+                  InkWell(
+                    onTap: ontap,
+                    child: Text(secondtext,
+                        style: const TextStyle(
+                            fontSize: 14.0, color: Colors.blue)),
+                  ),
+                ],
+              )
+            : Text(firsttext, style: const TextStyle(fontSize: 14.0)),
       ],
     );
   }

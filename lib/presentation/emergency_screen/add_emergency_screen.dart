@@ -67,7 +67,7 @@ class _AddHelplineScreenState extends State<AddHelplineScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Organization Status:'),
+                  // const Text('Organization Status:'),
                   Row(
                     children: [
                       const Text('Organization Status:'),

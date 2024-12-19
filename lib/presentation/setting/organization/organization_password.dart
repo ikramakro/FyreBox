@@ -21,15 +21,13 @@ class OrganizationNameScreen extends StatelessWidget {
       create: (context) => OrganizationNameProvider(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Change Password'),
+          title: const Text('Change Organization Name'),
           backgroundColor: const Color(0xffd61a21),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Consumer<OrganizationNameProvider>(
               builder: (context, provider, child) {
-            provider.oldPasswordController =
-                TextEditingController(text: dbData?.orgName ?? '');
             return ListView(
               children: [
                 Center(
@@ -57,15 +55,17 @@ class OrganizationNameScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8.0),
-                CustomTextFormField1(
-                  controller: provider.newPasswordController,
-                  hintText: 'Enter your new password',
-                  obscureText: !provider.isNewPasswordVisible,
-                  suffix: IconButton(
-                    icon: Icon(provider.isNewPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off),
-                    onPressed: provider.toggleNewPasswordVisibility,
+                Consumer<OrganizationNameProvider>(
+                  builder: (context, provider1, child) => CustomTextFormField1(
+                    controller: provider1.newPasswordController,
+                    hintText: 'Enter your new password',
+                    obscureText: !provider1.isNewPasswordVisible,
+                    suffix: IconButton(
+                      icon: Icon(provider1.isNewPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: provider1.toggleNewPasswordVisibility,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24.0),

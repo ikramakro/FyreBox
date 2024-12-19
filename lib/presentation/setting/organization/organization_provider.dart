@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fyrebox/core/utils/navigator_service.dart';
+import 'package:fyrebox/routes/app_routes.dart';
 
 import '../../../core/utils/constant.dart';
 import '../../../core/utils/pref_utils.dart';
@@ -17,6 +19,7 @@ class OrganizationNameProvider extends ChangeNotifier {
   bool isNewPasswordVisible = false;
   bool isRetypePasswordVisible = false;
   OrganizationNameProvider() {
+    oldPasswordController = TextEditingController(text: dbData?.orgName ?? '');
     init();
   }
 
@@ -51,6 +54,12 @@ class OrganizationNameProvider extends ChangeNotifier {
 
       if (response.sTATUS != "ERROR") {
         // Handle success
+        USERDATA userdata = prefUtils.getUserData()!;
+        await _repository.orgData(
+          formData: {'org_id': userdata.orgId},
+        );
+        // Notify listeners if there's any data that needs to update UI
+        NavigatorService.popAndPushNamed(AppRoutes.rootScreen, arguments: 0);
         showSuccess(response.dESCRIPTION ?? '');
         notifyListeners();
       } else {
